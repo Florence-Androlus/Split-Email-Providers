@@ -1,0 +1,195 @@
+body {
+
+    display: flex;
+
+    justify-content: center; /* Centre horizontalement */
+
+    align-items: center; /* Centre verticalement */
+
+    min-height: 100vh; /* Prend toute la hauteur de la fenêtre */
+
+    margin: 0; /* Supprime les marges par défaut */
+
+    background-color: #f8f9fa; /* Optionnel : couleur de fond */
+
+}
+
+
+
+.div_conteneur_parent {
+
+    display: flex;
+
+    justify-content: center; /* Centre le contenu horizontalement */
+
+    width: 100%; /* S'assure que le conteneur prend toute la largeur */
+
+}
+
+
+
+.div_conteneur_page {
+
+    width: 100%; /* S'assure que le conteneur prend toute la largeur */
+
+    max-width: 90%; /* Limite la largeur à 800px */
+
+    padding: 20px; /* Ajoute un peu de rembourrage */
+
+    background-color: white; /* Couleur de fond du conteneur */
+
+    border-radius: 8px; /* Coins arrondis */
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre douce */
+
+    margin: auto; /* Centre le conteneur sur la page */
+
+}
+
+
+
+h1 {
+
+    text-align: center; /* Centre le titre */
+
+}
+
+
+
+.centre {
+
+    text-align: center; /* Centre le contenu dans les éléments avec la classe 'centre' */
+
+}
+
+
+
+/*css pour le tableau*/
+
+.table {
+
+    table-layout: auto; /* Permet au tableau de s'adapter à la taille du contenu */
+
+    width: 100%; /* Assurez-vous que le tableau utilise toute la largeur disponible */
+
+    max-width: 100%; /* Empêche le tableau de dépasser le conteneur */
+
+}
+
+
+
+th, td {
+
+    white-space: nowrap; /* Empêche le texte de se mettre à la ligne */
+
+    overflow: hidden; /* Masque le débordement */
+
+    text-overflow: ellipsis; /* Affiche des points de suspension (...) pour le texte débordant */
+
+    padding: 10px; /* Ajoute un peu de rembourrage pour une meilleure lisibilité */
+
+    text-align: center; /* Centre le texte dans les cellules du tableau */
+
+}
+
+
+
+/*css pour la modal*/
+
+.modal {
+
+    display: none; /* Cacher la fenêtre modale par défaut */
+
+    position: fixed; /* Rester à la même position */
+
+    z-index: 2000; /* Assurez-vous qu'il est au-dessus */
+
+    left: 0;
+
+    top: 0;
+
+    width: 100%; /* Plein écran */
+
+    height: 100%; /* Plein écran */
+
+    overflow: auto; /* Ajouter un défilement si nécessaire */
+
+    background-color: rgba(0, 0, 0, 0.4); /* Arrière-plan semi-transparent */
+
+}
+
+
+
+.modal-dialog {
+
+    max-width: 500px; /* Ajustez cette valeur selon vos besoins */
+
+    margin: auto; /* Centre la modal */
+
+}
+
+
+
+.modal-content {
+
+    background-color: #fefefe;
+
+    margin: 15% auto; /* 15% du haut et centré */
+
+    padding: 20px;
+
+    border: 1px solid #888;
+
+    width: 80%; /* Largeur de la fenêtre modale */
+
+}
+
+
+
+.close {
+
+    color: #aaa;
+
+    float: right;
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+}
+
+
+
+.close:hover,
+
+.close:focus {
+
+    color: black;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+}
+
+input[disabled], select[disabled], textarea[disabled] {
+    color: #000; /* Couleur noire pour le texte */
+    background-color: #f0f0f0; /* Fond légèrement gris pour indiquer qu'il est désactivé */
+    opacity: 1; /* Supprimer l'opacité par défaut pour les champs désactivés */
+}
+
+button#import,button#importModalBtn{
+ margin:0 2rem;
+}
+
+#importModal {
+    display: none; /* Cache par défaut */
+    position: fixed; /* Reste à la même position */
+    z-index: 1050; /* Assurez-vous qu'il est au-dessus des autres éléments */
+    left: 0;
+    top: 0;
+    width: 100%; /* Plein écran */
+    height: 100%; /* Plein écran */
+    background-color: rgba(0, 0, 0, 0.5); /* Arrière-plan semi-transparent */
+}
+

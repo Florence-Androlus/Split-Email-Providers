@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "datatables.net-dt": "^2.1.8",
+    "fontawesome-free": "^1.0.4",
+    "install": "^0.13.0"
+  }
+}

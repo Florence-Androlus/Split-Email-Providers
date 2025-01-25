@@ -17,10 +17,23 @@ class FANDSettingsPage {
 		add_action( 'admin_menu', [$this,'register_fournisseurs_menu' ] );
 		// on ajoute nos URL custom
 		add_action('init', [$this,'registerCustomRewrites']);
+
 		// Ajouter l'action pour envoyer un email après le paiement complet de la commande
 		add_action('woocommerce_payment_complete', [$this,'envoyer_email_fournisseur_apres_paiement']);
 		add_action('woocommerce_order_status_processing', [$this,'envoyer_email_fournisseur_manuel']);
 
+		//requette AJAX pour récupérer les fournisseurs
+		add_action('wp_ajax_get_fournisseurs', [$this,'get_fournisseurs_callback']); // Pour les utilisateurs connectés
+		add_action('wp_ajax_nopriv_get_fournisseurs', [$this,'get_fournisseurs_callback']); // Pour les utilisateurs non connectés
+        //requette AJAX pour supprimer un fournisseur
+		add_action('wp_ajax_delete_fournisseur', [$this,'delete_fournisseur_callback']);
+		add_action('wp_ajax_nopriv_delete_fournisseur', [$this,'delete_fournisseur_callback']);
+		//requette AJAX pour récupérer la liste des pays
+		add_action('wp_ajax_get_countries', [$this,'get_countries_ajax']);
+		add_action('wp_ajax_nopriv_get_countries', [$this,'get_countries_ajax']);
+		//requette AJAX pour sauvegarder un fournisseur
+		add_action('wp_ajax_save_fournisseur', [$this,'save_fournisseur_ajax']);
+		add_action('wp_ajax_nopriv_save_fournisseur', [$this,'save_fournisseur_ajax']);
     }
 
 	// Fonction d'activation du plugin
@@ -38,6 +51,70 @@ class FANDSettingsPage {
     {
         Router::init();
     }
+
+	static function get_fournisseurs_callback() {
+        // Récupérer toutes les fournisseurs via la fonction Database::get_all_fournisseurs()
+        $fournisseurs = Database::get_all_fournisseurs();
+        // Retourner les licences sous forme de JSON pour Vue.js
+		wp_send_json_success($fournisseurs);
+		// Terminer l'exécution du script
+		wp_die();
+    }
+
+	static function delete_fournisseur_callback() {
+        // Récupérer les données envoyées via POST
+        $data = json_decode(file_get_contents('php://input'), true);
+		error_log('Requête delete_fournisseur reçue.');
+		error_log(print_r($_POST, true));
+        if (isset($data['fournisseur_id'])) {
+            // Effectuez la suppression du fournisseur en fonction de la clé
+            $alert=Database::delete_fournisseur($data); // Fonction à définir selon votre base de données
+            if ($alert) {
+                    // Réponse de succès
+                    wp_send_json_success($alert);
+                } else {
+                    // Réponse d'erreur
+                    wp_send_json_error(array('message' => 'Erreur lors de la suppression'));
+                }
+            } else {
+                wp_send_json_error(array('message' => 'Clé de licence manquante'));
+            }
+    }
+
+	// Fonction AJAX pour récupérer la liste des pays
+	static function get_countries_ajax() {
+		// Récupérer les pays via WooCommerce
+		$countries = WC()->countries->get_countries();
+
+		// Renvoyer la réponse JSON
+		wp_send_json_success($countries);
+	}
+
+	// Fonction AJAX pour sauvegarder un fournisseur
+	static function save_fournisseur_ajax() {
+        $data = json_decode(file_get_contents('php://input'), true);
+		error_log(print_r($data['fournisseur'], true));
+		if (isset($data['fournisseur'])) {
+			if ($data['mode']==='add'){
+				// Effectuez l'ajout du fournisseur
+				$alert=Database::add_fournisseur($data['fournisseur']);
+			}
+			else{
+				// Effectuez la mise a jour du fournisseur en fonction de son id
+				$alert=Database::update_fournisseur($data['fournisseur']);; 
+			}
+			if ($alert) {
+                    // Réponse de succès
+                    wp_send_json_success($alert);
+                } else {
+                    // Réponse d'erreur
+                    wp_send_json_error(array('message' => 'Erreur lors de l\'ajout ou la modification'));
+                }
+            } else {
+                wp_send_json_error(array('message' => 'Clé de licence manquante'));
+            }
+		
+	}
 
 	public function register_fournisseurs_menu() {
 
@@ -64,17 +141,38 @@ class FANDSettingsPage {
 		// Vérifie qu'on es bien sur les pages de paramètres de Split Email Providers
 		if ($hook_suffix === 'toplevel_page_fand-settings') {
 
-			$plugin_version = '1.0.0'; // Remplacez la version de plugin
-
 			// Enqueue des styles CSS
-			wp_enqueue_style('bootstrap6',FAND_PLUGIN_URL . 'assets/css/bootstrap.min.css',array(),$plugin_version);
-			wp_enqueue_style('font-awesome',FAND_PLUGIN_URL . 'assets/css/all.min.css',array(),$plugin_version);
-			wp_enqueue_style('custom-style',FAND_PLUGIN_URL . 'assets/css/style.css',array(),$plugin_version);
+			wp_enqueue_style('bootstrap',FAND_PLUGIN_URL . 'assets/css/bootstrap.min.css',array(),FAND_VERSION);
+			wp_enqueue_style('font-awesome',FAND_PLUGIN_URL . 'assets/css/all.min.css',array(),FAND_VERSION);
+			wp_enqueue_style('custom-style',FAND_PLUGIN_URL . 'assets/css/style.css',array(),FAND_VERSION);
 
 			// Enqueue des scripts JavaScript
 			wp_enqueue_script('jquery'); // Charge jQuery en priorité
-			wp_enqueue_script('custom-script',FAND_PLUGIN_URL . 'assets/js/script.js',array('jquery'),$plugin_version,true);
-			wp_enqueue_script('bootstrap',FAND_PLUGIN_URL . 'assets/js/bootstrap.bundle.min.js',array('jquery'),$plugin_version,true);
+			wp_enqueue_script('custom-script',FAND_PLUGIN_URL . 'assets/js/script.js',array('jquery'),FAND_VERSION,true);
+			wp_enqueue_script('bootstrap',FAND_PLUGIN_URL . 'assets/js/bootstrap.bundle.min.js',array('jquery'),FAND_VERSION,true);
+			wp_enqueue_script('vue-app', FAND_PLUGIN_URL . 'dist/bundle.js', array('jquery'), FAND_VERSION, true);
+
+			// Chemin vers le fichier de traduction en fonction de la langue
+			$current_locale = get_user_locale();
+			$translations_file = plugin_dir_path(__FILE__) . 'languages/split-email-providers-' . $current_locale . '.json';
+
+			if (file_exists($translations_file)) {
+				$translations = json_decode(file_get_contents($translations_file), true);
+			} else {
+				// Si le fichier JSON n'existe pas, tu peux soit passer un tableau vide soit les traductions par défaut
+				$translations_file = plugin_dir_path(__FILE__) . 'languages/split-email-providers-us_US.json';
+				$translations = json_decode(file_get_contents($translations_file), true);
+			}
+
+			// Passer les traductions à Vue.js
+			wp_localize_script('vue-app', 'wp_data', [
+				'locale' => $current_locale,
+				'translations' => $translations,
+			]);
+			// Ajouter la variable ajax_url dans le HTML
+            echo "<script type='text/javascript'>
+            var ajax_url = '" . admin_url('admin-ajax.php') . "';
+            </script>";
 		}
 	}
 
@@ -94,17 +192,29 @@ class FANDSettingsPage {
 
 		echo '<div style="margin-top:5em;">';	
 			echo '<div style="display: none;">';
-			echo '<a href="https://fan-develop.fr/Split-email-providers/" >Création de plugin custom php MySQL Javasript Gestion des envois d\'emails aux fournisseurs.</a>';
+				echo '<a href="https://fan-develop.fr/Split-email-providers/">Création de plugin custom php MySQL Javasript Gestion des envois d\'emails aux fournisseurs.</a>';
 			echo '</div>';
-			
-			// Inclure le tableau des fournisseurs
-			include FAND_PLUGIN_DIR . '/Templates/tableau-fournisseurs.php';
+			// Inclure le tableau des fournisseurs en vuejs
+			echo '<div id="app" style="margin-top:5em;">';
+			echo '</div>';
+		echo '</div>';
+	}
 
-			// Inclure les modales
-			include FAND_PLUGIN_DIR . '/Templates/modal-fournisseur.php';
-			include FAND_PLUGIN_DIR . '/Templates/import-fournisseurs.php';
-
-		echo'</div>';
+	function load_and_merge_translations($locale) {
+		// Chemin du fichier JSON de WooCommerce
+		$woocommerce_translations_file = plugin_dir_path(__FILE__) . 'languages/woocommerce-' . $locale . '.json';
+		$woocommerce_translations = file_exists($woocommerce_translations_file)
+			? json_decode(file_get_contents($woocommerce_translations_file), true)
+			: [];
+	
+		// Chemin du fichier JSON de ton plugin
+		$plugin_translations_file = plugin_dir_path(__FILE__) . 'languages/' . $locale . '.json';
+		$plugin_translations = file_exists($plugin_translations_file)
+			? json_decode(file_get_contents($plugin_translations_file), true)
+			: [];
+	
+		// Fusionner les traductions
+		return array_merge($woocommerce_translations, $plugin_translations);
 	}
 
 	// Fonction pour les paiements par chèque

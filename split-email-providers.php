@@ -2,19 +2,20 @@
 
 /**
 * @package split-email-providers
-* @version 1.6
+* @version 1.0.1
 */
 
-/* Plugin Name:        Split Email Providers 28 12 24 renvoyé
+/* Plugin Name:        Split Email Providers
 * Description:         Gestion des envois d'emails aux fournisseurs
-* Version:             1.0.0
+* Version:             1.0.1
 * Requires at least:   6.7
 * Requires PHP:        8.0
 * Author:              Fan-Develop
-* Author URI:          https://fan-develop.fr
+* Author URI:          https://split-email-providers.com/
 * License:             GPL v2 or later
 * License URI:         https://www.gnu.org/licenses/gpl-2.0.html
 * Text Domain:         split-email-providers
+* Domain Path:         /languages
 */
 
 namespace fand;
@@ -29,6 +30,7 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
 }
 
 
+load_plugin_textdomain('split-email-providers', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
 // Utilisation de l'autoload PSR-4 de Composer
 require __DIR__ . '/vendor/autoload.php';
@@ -37,6 +39,10 @@ require __DIR__ . '/vendor/autoload.php';
 define('FAND_MAIN_FILE', __FILE__);
 define('FAND_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FAND_PLUGIN_DIR', plugin_dir_path(__FILE__));
+/**
+ * Plugin version
+ */
+define('FAND_VERSION', '1.0.1');
 
 // Défini la table des fournisseurs
 global $wpdb;

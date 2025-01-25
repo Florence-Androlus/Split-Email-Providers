@@ -5,7 +5,7 @@ Tags: WooCommerce, supplier, email, supplier management
 Requires at least: 5.0  
 Tested up to: 6.7  
 Requires PHP: 8.0  
-Stable tag: 1.0.0  
+Stable tag: 1.0.1  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -40,6 +40,10 @@ No, the addon does not currently include options to customize the email message 
 
 == Changelog ==
 
+= 1.0.1 =
+* translation FR => US
+* Fix minor bugs
+
 = 1.0.0 =  
 * 🚀 Initial release of the addon.  
 * 📩 Automated email functionality for suppliers.  
@@ -47,7 +51,7 @@ No, the addon does not currently include options to customize the email message 
 == Upgrade Notice ==
 
 = 1.0.0 =  
-First release of Split Email Providers – send automated emails to suppliers without intermediaries.  
+* First release of Split Email Providers – send automated emails to suppliers without intermediaries.  
 
 == Additional Notes ==
 

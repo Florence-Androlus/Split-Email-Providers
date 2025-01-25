@@ -102,7 +102,7 @@ class Database {
 
         // Récupérer les données du formulaire
         $data= [
-            'fournisseur_id' => isset($data['fournisseurId']) ? intval($data['fournisseurId']) : 0,
+            'fournisseur_id' => isset($data['id']) ? intval($data['id']) : 0,
             'nom' => isset($data['nom']) ? sanitize_text_field($data['nom']) : '',
             'adresse' => isset($data['adresse']) ? stripslashes(sanitize_text_field($data['adresse'])) : '',
             'cp' => isset($data['cp']) ? sanitize_text_field($data['cp']) : '',
@@ -113,6 +113,7 @@ class Database {
         ];
 
         extract($data); // Pour rendre les variables disponibles séparément
+        error_log($fournisseur_id);
 
         // Récupérer l'ancien nom pour vérifier le changement
         $ancien_fournisseur = $wpdb->get_row($wpdb->prepare("SELECT nom FROM %i WHERE id = %d",FAND_FOURNISSEURS_TABLE,$fournisseur_id));
@@ -120,7 +121,7 @@ class Database {
         if(isset($ancien_fournisseur->nom)){
         $ancien_nom = $ancien_fournisseur->nom;
         }
-
+        error_log($ancien_nom);
         // Mettre à jour le fournisseur
         $result = $wpdb->update(FAND_FOURNISSEURS_TABLE, array(
             'nom' => $nom,
@@ -157,7 +158,13 @@ class Database {
         return $alert;
     }
 
-    static public function delete_fournisseur($POST)
+    static function get_all_fournisseurs(){
+        global $wpdb;
+        $fournisseurs = $wpdb->get_results($wpdb->prepare("SELECT * FROM %i", FAND_FOURNISSEURS_TABLE));
+        return $fournisseurs;
+    }
+
+    static function delete_fournisseur($POST)
     {
         global $wpdb;
         $alert=[];
@@ -188,11 +195,11 @@ class Database {
         $deleted = $wpdb->delete(FAND_FOURNISSEURS_TABLE, array('id' => $fournisseur_id));
 
         if ($deleted) {
-            $message = ' Fournisseur supprimé avec succès.';
+            $message = 'Fournisseur supprimé avec succès.';
             $message_type = 'success'; // Indicateur de succès
         } 
         else {
-            $message = ' Erreur lors de la suppression du fournisseur.';
+            $message = 'Erreur lors de la suppression du fournisseur.';
             $message_type = 'error'; // Indicateur d'erreur
         }
 

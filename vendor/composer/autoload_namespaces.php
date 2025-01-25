@@ -6,5 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'cli' => array($vendorDir . '/wp-cli/php-cli-tools/lib'),
+    'WP_CLI\\' => array($vendorDir . '/wp-cli/wp-cli/php'),
+    'Mustache' => array($vendorDir . '/mustache/mustache/src'),
     'HTTP_Request2' => array($vendorDir . '/pear/http_request2'),
 );

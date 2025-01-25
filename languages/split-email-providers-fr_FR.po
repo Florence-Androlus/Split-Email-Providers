@@ -1,0 +1,236 @@
+# Translation of Plugins - Split Email Providers - Stable (latest release) in French (France)
+# This file is distributed under the same license as the Plugins - Split Email Providers - Stable (latest release) package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Plugins - Split Email Providers - Stable (latest "
+"release)\n"
+"POT-Creation-Date: 2025-01-15 18:45+0100\n"
+"PO-Revision-Date: 2025-01-15 18:49+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Poedit 3.5\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#. Author URI of the plugin
+#. Plugin Name of the plugin
+#: split-email-providers.php
+msgid "Split Email Providers"
+msgstr "Split Email Providers"
+
+#: plugin.php:86
+msgid "Échec de la vérification de sécurité."
+msgstr "Échec de la vérification de sécurité."
+
+#: Classes/Router.php:63
+msgid "Nonce non valide pour la suppression du fournisseur."
+msgstr "Nonce non valide pour la suppression du fournisseur."
+
+#: Classes/Router.php:56
+msgid "Nonce non valide pour la mise à jour du fournisseur."
+msgstr "Nonce non valide pour la mise à jour du fournisseur."
+
+#: Classes/Import_fournisseurs.php:20 Classes/Router.php:77
+#: Classes/Router.php:85
+msgid "Vérification nonce échouée. Action non autorisée."
+msgstr "Vérification nonce échouée. Action non autorisée."
+
+#. Author of the plugin
+#: split-email-providers.php
+msgid "Fan-Develop"
+msgstr "Fan-Develop"
+
+#. Description of the plugin
+#: split-email-providers.php
+msgid "Gestion des envois d'emails aux fournisseurs"
+msgstr "Gestion des envois d'emails aux fournisseurs"
+
+#. Title plugins
+#: split-email-providers.php
+msgid "Tableau des fournisseurs"
+msgstr "Tableau des fournisseurs"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Ajouter"
+msgstr "Ajouter"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Importer"
+msgstr "Importer"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Exporter"
+msgstr "Exporter"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Vous devez passer à la version PRO."
+msgstr "Vous devez passer à la version PRO."
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Nom"
+msgstr "Nom"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Adresse"
+msgstr "Adresse"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "CP"
+msgstr "Code Postal"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Ville"
+msgstr "Ville"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Pays"
+msgstr "Pays"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Email"
+msgstr "Email"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Téléphone"
+msgstr "Téléphone"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Voir"
+msgstr "Voir"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Modifier"
+msgstr "Modifier"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Supprimer"
+msgstr "Supprimer"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Aucune fournisseurs disponible."
+msgstr "Aucune fournisseurs disponible."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Le fournisseur existe déjà."
+msgstr "Le fournisseur existe déjà."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Fournisseur ajouté, mais erreur lors de l'ajout du term."
+msgstr "Fournisseur ajouté, mais erreur lors de l'ajout du term."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Fournisseur ajouté avec succès !"
+msgstr "Fournisseur ajouté avec succès !"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Erreur lors de l'ajout du fournisseur."
+msgstr "Erreur lors de l'ajout du fournisseur."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Fournisseur mis à jour avec succès !"
+msgstr "Fournisseur mis à jour avec succès !"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Erreur lors de la mise à jour du fournisseur."
+msgstr "Erreur lors de la mise à jour du fournisseur."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Erreur lors de la suppression du term : "
+msgstr "Erreur lors de la suppression du term : "
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Term supprimé avec succès."
+msgstr "Term supprimé avec succès."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Fournisseur supprimé avec succès."
+msgstr "Fournisseur supprimé avec succès."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Erreur lors de la suppression du fournisseur."
+msgstr "Erreur lors de la suppression du fournisseur."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Fournisseur enregistré avec succès."
+msgstr "Fournisseur enregistré avec succès."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Êtes-vous sûr de vouloir supprimer ce fournisseur ?"
+msgstr "Êtes-vous sûr de vouloir supprimer ce fournisseur ?"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Ajouter un fournisseur"
+msgstr "Ajouter un fournisseur"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Modifier fournisseur"
+msgstr "Modifier fournisseur"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Voir fournisseur"
+msgstr "Voir fournisseur"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Enregistrer"
+msgstr "Enregistrer"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Veuillez remplir les champs obligatoires"
+msgstr "Veuillez remplir les champs obligatoires"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Veuillez renseigner ce champ."
+msgstr "Veuillez renseigner ce champ."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Modal fermée"
+msgstr "Modal fermée"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Précédent"
+msgstr "Précédent"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Suivant"
+msgstr "Suivant"

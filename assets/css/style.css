@@ -64,34 +64,103 @@ h1 {
 
 
 
-/*css pour le tableau*/
-
-.table {
-
-    table-layout: auto; /* Permet au tableau de s'adapter à la taille du contenu */
-
-    width: 100%; /* Assurez-vous que le tableau utilise toute la largeur disponible */
-
-    max-width: 100%; /* Empêche le tableau de dépasser le conteneur */
-
+/* Styles de base pour le tableau */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
 }
 
-
-
-th, td {
-
-    white-space: nowrap; /* Empêche le texte de se mettre à la ligne */
-
-    overflow: hidden; /* Masque le débordement */
-
-    text-overflow: ellipsis; /* Affiche des points de suspension (...) pour le texte débordant */
-
-    padding: 10px; /* Ajoute un peu de rembourrage pour une meilleure lisibilité */
-
-    text-align: center; /* Centre le texte dans les cellules du tableau */
-
+/* En-têtes du tableau */
+th {
+    background-color: #f7f7f7;
+    color: #333;
+    text-align: left;
+    padding: 10px;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
 }
 
+/* Cellules */
+td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    vertical-align: middle;
+}
+
+/* Alternance des lignes */
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Effet au survol */
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Boutons */
+button {
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Boutons personnalisés */
+button.view {
+    background-color: #007bff; /* Bleu */
+}
+
+button.edit {
+    background-color: #ffc107; /* Jaune */
+    color: #000;
+}
+
+button.delete {
+    background-color: #dc3545; /* Rouge */
+}
+
+/* Alignement des colonnes avec du texte long */
+td {
+    max-width: 200px; /* Ajustez selon vos besoins */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+.alert-hidden {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    visibility: hidden;
+}
 
 
 /*css pour la modal*/
@@ -193,3 +262,7 @@ button#import,button#importModalBtn{
     background-color: rgba(0, 0, 0, 0.5); /* Arrière-plan semi-transparent */
 }
 
+.tooltip {
+    --bs-tooltip-bg:#cff4fc !important; /* Couleur de fond de la tooltip */
+    --bs-tooltip-color: black !important;  /* Couleur du texte de la tooltip */
+}

@@ -6,11 +6,24 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitb77f6acb8a06201afbc2c5726468dea5
 {
+    public static $files = array (
+        '3937806105cc8e221b8fa8db5b70d2f2' => __DIR__ . '/..' . '/wp-cli/mustangostang-spyc/includes/functions.php',
+        'be01b9b16925dcb22165c40b46681ac6' => __DIR__ . '/..' . '/wp-cli/php-cli-tools/lib/cli/cli.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
         'f' => 
         array (
             'fand\\Classes\\' => 13,
             'fand\\' => 5,
+        ),
+        'S' => 
+        array (
+            'Symfony\\Component\\Finder\\' => 25,
+        ),
+        'M' => 
+        array (
+            'Mustangostang\\' => 14,
         ),
         'A' => 
         array (
@@ -27,6 +40,14 @@ class ComposerStaticInitb77f6acb8a06201afbc2c5726468dea5
         array (
             0 => __DIR__ . '/../..' . '/',
         ),
+        'Symfony\\Component\\Finder\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/finder',
+        ),
+        'Mustangostang\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/wp-cli/mustangostang-spyc/src',
+        ),
         'Automattic\\WooCommerce\\' => 
         array (
             0 => __DIR__ . '/..' . '/automattic/woocommerce/src/WooCommerce',
@@ -34,6 +55,27 @@ class ComposerStaticInitb77f6acb8a06201afbc2c5726468dea5
     );
 
     public static $prefixesPsr0 = array (
+        'c' => 
+        array (
+            'cli' => 
+            array (
+                0 => __DIR__ . '/..' . '/wp-cli/php-cli-tools/lib',
+            ),
+        ),
+        'W' => 
+        array (
+            'WP_CLI\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/wp-cli/wp-cli/php',
+            ),
+        ),
+        'M' => 
+        array (
+            'Mustache' => 
+            array (
+                0 => __DIR__ . '/..' . '/mustache/mustache/src',
+            ),
+        ),
         'H' => 
         array (
             'HTTP_Request2' => 
@@ -47,6 +89,8 @@ class ComposerStaticInitb77f6acb8a06201afbc2c5726468dea5
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Net_URL2' => __DIR__ . '/..' . '/pear/net_url2/Net/URL2.php',
         'PEAR_Exception' => __DIR__ . '/..' . '/pear/pear_exception/PEAR/Exception.php',
+        'WP_CLI' => __DIR__ . '/..' . '/wp-cli/wp-cli/php/class-wp-cli.php',
+        'WP_CLI_Command' => __DIR__ . '/..' . '/wp-cli/wp-cli/php/class-wp-cli-command.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

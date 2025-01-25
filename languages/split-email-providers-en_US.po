@@ -1,0 +1,236 @@
+# Translation of Plugins - Split Email Providers - Stable (latest release) in French (France)
+# This file is distributed under the same license as the Plugins - Split Email Providers - Stable (latest release) package.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Plugins - Split Email Providers - Stable (latest release)\n"
+"POT-Creation-Date: 2025-01-15 18:50+0100\n"
+"PO-Revision-Date: 2025-01-20 16:09+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.5\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#. Author URI of the plugin
+#. Plugin Name of the plugin
+#: split-email-providers.php
+msgid "Split Email Providers"
+msgstr "Split Email Providers"
+
+#: plugin.php:86
+msgid "Échec de la vérification de sécurité."
+msgstr "Security check failed."
+
+#: Classes/Router.php:63
+msgid "Nonce non valide pour la suppression du fournisseur."
+msgstr "Nonce not valid for vendor deletion."
+
+#: Classes/Router.php:56
+msgid "Nonce non valide pour la mise à jour du fournisseur."
+msgstr "Invalid nonce for provider update."
+
+#: Classes/Import_fournisseurs.php:20 Classes/Router.php:77
+#: Classes/Router.php:85
+msgid "Vérification nonce échouée. Action non autorisée."
+msgstr "Nonce check failed. Unauthorized action."
+
+#. Author of the plugin
+#: split-email-providers.php
+msgid "Fan-Develop"
+msgstr "Fan-Develop"
+
+#. Description of the plugin
+#: split-email-providers.php
+msgid "Gestion des envois d'emails aux fournisseurs"
+msgstr "Managing email sending to suppliers"
+
+#. Title plugins
+#: split-email-providers.php
+msgid "Tableau des fournisseurs"
+msgstr "Providers table"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Ajouter"
+msgstr "Add"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Importer"
+msgstr "Import"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Exporter"
+msgstr "Export"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Vous devez passer à la version PRO."
+msgstr "You need to upgrade to the PRO version."
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Nom"
+msgstr "Name"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Adresse"
+msgstr "Address"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "CP"
+msgstr "Postal Code"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Ville"
+msgstr "City"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Pays"
+msgstr "Country"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Email"
+msgstr "Email"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Téléphone"
+msgstr "Phone"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Voir"
+msgstr "View"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Modifier"
+msgstr "Edit"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Supprimer"
+msgstr "Delete"
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Aucune fournisseurs disponible."
+msgstr "No providers available."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Le fournisseur existe déjà."
+msgstr "The provider already exists."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Fournisseur ajouté, mais erreur lors de l'ajout du term."
+msgstr "Provider added, but error adding term."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Fournisseur ajouté avec succès !"
+msgstr "Provider added successfully!"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Erreur lors de l'ajout du fournisseur."
+msgstr "Error adding provider."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Fournisseur mis à jour avec succès !"
+msgstr "Provider updated successfully!"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Erreur lors de la mise à jour du fournisseur."
+msgstr "Error updating provider."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Erreur lors de la suppression du term : "
+msgstr "Error deleting term: "
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Term supprimé avec succès."
+msgstr "Term successfully deleted."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Fournisseur supprimé avec succès."
+msgstr "Provider successfully removed."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Erreur lors de la suppression du fournisseur."
+msgstr "Error deleting provider."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Fournisseur enregistré avec succès."
+msgstr "Provider successfully registered."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Êtes-vous sûr de vouloir supprimer ce fournisseur ?"
+msgstr "Are you sure you want to remove this provider?"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Modifier fournisseur"
+msgstr "Change provider"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Ajouter un fournisseur"
+msgstr "Add a provider"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Voir fournisseur"
+msgstr "See provider"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Enregistrer"
+msgstr "Save"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Veuillez remplir les champs obligatoires"
+msgstr "Please fill in the required fields"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Veuillez renseigner ce champ."
+msgstr "Please fill in this field."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Modal fermée"
+msgstr "Closed modal"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Précédent"
+msgstr "Previous"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Suivant"
+msgstr "Next"

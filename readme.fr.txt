@@ -5,7 +5,7 @@ Tags: WooCommerce, fournisseur, email, gestion fournisseurs
 Requires at least: 5.0  
 Tested up to: 6.7  
 Requires PHP: 8.0  
-Stable tag: 1.0.0  
+Stable tag: 1.0.1  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -39,6 +39,9 @@ Non, l'addon n'inclut pas pour l'instant d'options pour personnaliser le message
 2. **Email au fournisseur** – 📨 Exemple d'email envoyé aux fournisseurs pour une commande spécifique.  
 
 == Changelog ==
+= 1.0.1 =
+* traduction FR => US
+* Correction de bugs mineurs
 
 = 1.0.0 =  
 * 🚀 Lancement initial de l'addon.  

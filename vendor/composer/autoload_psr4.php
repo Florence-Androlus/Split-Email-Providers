@@ -8,5 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'fand\\Classes\\' => array($baseDir . '/src/Classes'),
     'fand\\' => array($baseDir . '/'),
+    'Symfony\\Component\\Finder\\' => array($vendorDir . '/symfony/finder'),
+    'Mustangostang\\' => array($vendorDir . '/wp-cli/mustangostang-spyc/src'),
     'Automattic\\WooCommerce\\' => array($vendorDir . '/automattic/woocommerce/src/WooCommerce'),
 );

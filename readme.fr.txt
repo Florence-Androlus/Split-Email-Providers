@@ -4,8 +4,8 @@ Donate link: https://fan-develop.fr
 Tags: WooCommerce, fournisseur, email, gestion fournisseurs  
 Requires at least: 5.0  
 Tested up to: 6.7  
-Requires PHP: 8.0  
-Stable tag: 1.0.1  
+Requires PHP: 8.2  
+Stable tag: 1.0.4  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -39,8 +39,21 @@ Non, l'addon n'inclut pas pour l'instant d'options pour personnaliser le message
 2. **Email au fournisseur** – 📨 Exemple d'email envoyé aux fournisseurs pour une commande spécifique.  
 
 == Changelog ==
+
+= 1.0.4 =
+* Ajout mots de traduction FR => US
+* Passage en addon de la version pro sur la version free
+
+= 1.0.3 =
+* Ajout mots de traduction FR => US
+* Ajout verification activation plugin pro ou free
+
+= 1.0.2 =
+* Ajout mots de traduction FR => US
+* Retrait gestion version
+
 = 1.0.1 =
-* traduction FR => US
+* Traduction FR => US
 * Correction de bugs mineurs
 
 = 1.0.0 =  

@@ -127,8 +127,14 @@ msgstr "Supprimer"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Aucune fournisseurs disponible."
-msgstr "Aucune fournisseurs disponible."
+msgid "Aucun fournisseur disponible."
+msgstr "Aucun fournisseur disponible."
+
+#. Description plugins
+#: split-email-providers.php
+msgid "Aucun fournisseur trouvé pour cette lettre."
+msgstr "Aucun fournisseur trouvé pour cette lettre."
+
 
 #. Message plugins
 #: split-email-providers.php
@@ -234,3 +240,48 @@ msgstr "Précédent"
 #: split-email-providers.php
 msgid "Suivant"
 msgstr "Suivant"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Page"
+msgstr "Page"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "sur"
+msgstr "sur"
+
+#. Importation plugins
+#: split-email-providers.php
+msgid "Importation de Fournisseurs"
+msgstr "Importation de Fournisseurs"
+
+#. Importation plugins
+#: split-email-providers.php
+msgid "Importation..."
+msgstr "Importation..."
+
+#. Importation plugins
+#: split-email-providers.php
+msgid "Veuillez sélectionner un fichier CSV."
+msgstr "Veuillez sélectionner un fichier CSV."
+
+#. Exportation plugins
+#: split-email-providers.php
+msgid "Aucun fournisseur à exporter."
+msgstr "Aucun fournisseur à exporter."
+
+#. Cle licence plugins
+#: split-email-providers.php
+msgid "Saisie de la clé de licence"
+msgstr "Saisie de la clé de licence"
+
+#. Cle licence plugins
+#: split-email-providers.php
+msgid "Clé de licence :"
+msgstr "Clé de licence "
+
+#. Cle licence plugins
+#: split-email-providers.php
+msgid "Enregistrer la clé"
+msgstr "Enregistrer la clé"

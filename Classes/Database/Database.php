@@ -113,7 +113,6 @@ class Database {
         ];
 
         extract($data); // Pour rendre les variables disponibles séparément
-        error_log($fournisseur_id);
 
         // Récupérer l'ancien nom pour vérifier le changement
         $ancien_fournisseur = $wpdb->get_row($wpdb->prepare("SELECT nom FROM %i WHERE id = %d",FAND_FOURNISSEURS_TABLE,$fournisseur_id));
@@ -121,7 +120,7 @@ class Database {
         if(isset($ancien_fournisseur->nom)){
         $ancien_nom = $ancien_fournisseur->nom;
         }
-        error_log($ancien_nom);
+        //error_log($ancien_nom);
         // Mettre à jour le fournisseur
         $result = $wpdb->update(FAND_FOURNISSEURS_TABLE, array(
             'nom' => $nom,

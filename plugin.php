@@ -2,7 +2,6 @@
 
 namespace fand;
 
-use fand\Classes\Router;
 use fand\Classes\FAND_Attribut;
 use fand\Classes\Database\Database;
 
@@ -15,8 +14,6 @@ class FANDSettingsPage {
 		add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
 		// Register the settings page.
 		add_action( 'admin_menu', [$this,'register_fournisseurs_menu' ] );
-		// on ajoute nos URL custom
-		add_action('init', [$this,'registerCustomRewrites']);
 
 		// Ajouter l'action pour envoyer un email après le paiement complet de la commande
 		add_action('woocommerce_payment_complete', [$this,'envoyer_email_fournisseur_apres_paiement']);
@@ -34,6 +31,7 @@ class FANDSettingsPage {
 		//requette AJAX pour sauvegarder un fournisseur
 		add_action('wp_ajax_save_fournisseur', [$this,'save_fournisseur_ajax']);
 		add_action('wp_ajax_nopriv_save_fournisseur', [$this,'save_fournisseur_ajax']);
+
     }
 
 	// Fonction d'activation du plugin
@@ -45,12 +43,6 @@ class FANDSettingsPage {
 		FAND_Attribut::add_nouvel_attribut($nom_attribut,FAND_FOURNISSEURS_ATTRIBUT);
 		Database::init();
 	}
-
-	// Fonction ajout des URL custom
-    static function registerCustomRewrites()
-    {
-        Router::init();
-    }
 
 	static function get_fournisseurs_callback() {
         // Récupérer toutes les fournisseurs via la fonction Database::get_all_fournisseurs()
@@ -64,8 +56,8 @@ class FANDSettingsPage {
 	static function delete_fournisseur_callback() {
         // Récupérer les données envoyées via POST
         $data = json_decode(file_get_contents('php://input'), true);
-		error_log('Requête delete_fournisseur reçue.');
-		error_log(print_r($_POST, true));
+		//error_log('Requête delete_fournisseur reçue.');
+		//error_log(print_r($_POST, true));
         if (isset($data['fournisseur_id'])) {
             // Effectuez la suppression du fournisseur en fonction de la clé
             $alert=Database::delete_fournisseur($data); // Fonction à définir selon votre base de données
@@ -93,7 +85,7 @@ class FANDSettingsPage {
 	// Fonction AJAX pour sauvegarder un fournisseur
 	static function save_fournisseur_ajax() {
         $data = json_decode(file_get_contents('php://input'), true);
-		error_log(print_r($data['fournisseur'], true));
+		//error_log(print_r($data['fournisseur'], true));
 		if (isset($data['fournisseur'])) {
 			if ($data['mode']==='add'){
 				// Effectuez l'ajout du fournisseur
@@ -124,7 +116,7 @@ class FANDSettingsPage {
 			'Fournisseurs', // Le nom du menu
 			'manage_options', // La capacité requise
 			'fand-settings', // Le slug de la page
-			array($this, 'render_tableau_fournisseurs_page'), // La fonction de rappel pour afficher le contenu de la page
+			[$this, 'render_tableau_fournisseurs_page'], // La fonction de rappel pour afficher le contenu de la page
 			'dashicons-share', // L'icône à utiliser pour ce menu
 			59 // La position dans l'ordre du menu où celui-ci doit apparaître
 		);
@@ -150,30 +142,34 @@ class FANDSettingsPage {
 			wp_enqueue_script('jquery'); // Charge jQuery en priorité
 			wp_enqueue_script('custom-script',FAND_PLUGIN_URL . 'assets/js/script.js',array('jquery'),FAND_VERSION,true);
 			wp_enqueue_script('bootstrap',FAND_PLUGIN_URL . 'assets/js/bootstrap.bundle.min.js',array('jquery'),FAND_VERSION,true);
-			wp_enqueue_script('vue-app', FAND_PLUGIN_URL . 'dist/bundle.js', array('jquery'), FAND_VERSION, true);
-
-			// Chemin vers le fichier de traduction en fonction de la langue
-			$current_locale = get_user_locale();
-			$translations_file = plugin_dir_path(__FILE__) . 'languages/split-email-providers-' . $current_locale . '.json';
-
-			if (file_exists($translations_file)) {
-				$translations = json_decode(file_get_contents($translations_file), true);
-			} else {
-				// Si le fichier JSON n'existe pas, tu peux soit passer un tableau vide soit les traductions par défaut
-				$translations_file = plugin_dir_path(__FILE__) . 'languages/split-email-providers-us_US.json';
-				$translations = json_decode(file_get_contents($translations_file), true);
-			}
-
-			// Passer les traductions à Vue.js
-			wp_localize_script('vue-app', 'wp_data', [
-				'locale' => $current_locale,
-				'translations' => $translations,
-			]);
-			// Ajouter la variable ajax_url dans le HTML
-            echo "<script type='text/javascript'>
-            var ajax_url = '" . admin_url('admin-ajax.php') . "';
-            </script>";
+			wp_enqueue_script('vue-app', FAND_PLUGIN_URL . 'dist/tableauFournisseurs.js', array('jquery'), FAND_VERSION, true);
 		}
+
+		// Chemin vers le fichier de traduction en fonction de la langue
+		$current_locale = get_user_locale();
+		$translations_file = plugin_dir_path(__FILE__) . 'languages/split-email-providers-' . $current_locale . '.json';
+
+		if (file_exists($translations_file)) {
+			$translations = json_decode(file_get_contents($translations_file), true);
+		} else {
+			// Si le fichier JSON n'existe pas, tu peux soit passer un tableau vide soit les traductions par défaut
+			$translations_file = plugin_dir_path(__FILE__) . 'languages/split-email-providers-en_US.json';
+			$translations = json_decode(file_get_contents($translations_file), true);
+		}
+			
+		// Création du tableau de données
+		$data_to_pass = [
+			'locale' => $current_locale,
+			'translations' => $translations,
+			'licenceStatus' => FAND_PRO_IMPORT_EXPORT_ENABLED,
+		];
+	
+		// Passer les données à Vue.js
+		wp_localize_script('vue-app', 'FandProData', $data_to_pass);
+		// Ajouter la variable ajax_url dans le HTML
+		echo "<script type='text/javascript'>
+		var ajax_url = '" . esc_url(admin_url('admin-ajax.php')) . "';
+		</script>";
 	}
 
 	// Render the settings page.
@@ -184,12 +180,6 @@ class FANDSettingsPage {
 			wp_die(esc_html__('Échec de la vérification de sécurité.', 'split-email-providers'));
 		}
 
-		$action = isset($_GET['action']) ? sanitize_text_field(wp_unslash($_GET['action'])) : '';
-
-		// Vérifier si un message est passé dans l'URL
-		$message = isset($_GET['message']) ? sanitize_text_field(wp_unslash($_GET['message'])) : '';
-		$message_type = isset($_GET['message_type']) ? sanitize_text_field(wp_unslash($_GET['message_type'])) : '';
-
 		echo '<div style="margin-top:5em;">';	
 			echo '<div style="display: none;">';
 				echo '<a href="https://fan-develop.fr/Split-email-providers/">Création de plugin custom php MySQL Javasript Gestion des envois d\'emails aux fournisseurs.</a>';
@@ -198,23 +188,6 @@ class FANDSettingsPage {
 			echo '<div id="app" style="margin-top:5em;">';
 			echo '</div>';
 		echo '</div>';
-	}
-
-	function load_and_merge_translations($locale) {
-		// Chemin du fichier JSON de WooCommerce
-		$woocommerce_translations_file = plugin_dir_path(__FILE__) . 'languages/woocommerce-' . $locale . '.json';
-		$woocommerce_translations = file_exists($woocommerce_translations_file)
-			? json_decode(file_get_contents($woocommerce_translations_file), true)
-			: [];
-	
-		// Chemin du fichier JSON de ton plugin
-		$plugin_translations_file = plugin_dir_path(__FILE__) . 'languages/' . $locale . '.json';
-		$plugin_translations = file_exists($plugin_translations_file)
-			? json_decode(file_get_contents($plugin_translations_file), true)
-			: [];
-	
-		// Fusionner les traductions
-		return array_merge($woocommerce_translations, $plugin_translations);
 	}
 
 	// Fonction pour les paiements par chèque
@@ -300,17 +273,17 @@ class FANDSettingsPage {
 
 				// Ajouter les produits dans un tableau associant fournisseur et e-mail
 				if (!isset($produits_par_fournisseur[$fournisseur_email])) {
-					$produits_par_fournisseur[$fournisseur_email] = array(
+					$produits_par_fournisseur[$fournisseur_email] = [
 						'nom_fournisseur' => $fournisseur_nom,
-						'produits' => array()
-					);
+						'produits' => []
+					];
 				}
 
-				$produits_par_fournisseur[$fournisseur_email]['produits'][] = array(
+				$produits_par_fournisseur[$fournisseur_email]['produits'][] = [
 					'nom' => $item->get_name(),
 					'quantite' => $item->get_quantity(),
 					'gtin' => $gtin
-				);
+				];
 			} else {
 				continue;
 			}
@@ -334,7 +307,7 @@ class FANDSettingsPage {
 			// Inclure l'email body
 			include FAND_PLUGIN_DIR . '/Templates/email-fournisseur.php';
 			// Headers pour inclure l'admin en CC
-			$headers = array('Content-Type: text/html; charset=UTF-8','From: ' . $shop_name . ' <' . $shop_email . '>','Cc: ' . $admin_email);
+			$headers = ['Content-Type: text/html; charset=UTF-8','From: ' . $shop_name . ' <' . $shop_email . '>','Cc: ' . $admin_email];
 
 			// Envoi de l'email
 			$mail_sent = wp_mail($fournisseur_email, $email_subject, $email_body, $headers);

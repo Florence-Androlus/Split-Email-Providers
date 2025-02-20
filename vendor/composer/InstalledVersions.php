@@ -29,7 +29,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'a1aa80c3641a756cb1b42c169d742c61b23829e2',
+    'reference' => 'ac9932bc60c3a5add87f97d06b5d059a081ea1c7',
     'name' => 'androlus/fand-split-email-fournisseurs',
   ),
   'versions' => 
@@ -41,7 +41,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'a1aa80c3641a756cb1b42c169d742c61b23829e2',
+      'reference' => 'ac9932bc60c3a5add87f97d06b5d059a081ea1c7',
     ),
     'automattic/woocommerce' => 
     array (

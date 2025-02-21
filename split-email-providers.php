@@ -1,7 +1,7 @@
 <?php
 /* Plugin Name:        Split Email Providers
 * Description:         Gestion des envois d'emails aux fournisseurs
-* Version:             1.0.4
+* Version:             1.0.5
 * Requires at least:   6.7
 * Requires PHP:        8.2
 * Author:              Fan-Develop
@@ -41,7 +41,7 @@ if (!class_exists('fand\\Classes\\Apifournisseur')) {
 }
 
 // Définition des constantes
-define('FAND_VERSION', '1.0.4');
+define('FAND_VERSION', '1.0.5');
 define('FAND_MAIN_FILE', __FILE__);
 define('FAND_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FAND_PLUGIN_DIR', plugin_dir_path(__FILE__));
@@ -54,6 +54,7 @@ if (is_plugin_active(FAND_PRO_PLUGIN)) {
     require_once FAND_PRO_PLUGIN_DIR.'Classes/Export_fournisseurs.php';
     require_once FAND_PRO_PLUGIN_DIR.'Classes/Import_fournisseurs.php';
     require_once FAND_PRO_PLUGIN_DIR.'Classes/Api/Api_fournisseur.php';
+    require_once FAND_PRO_PLUGIN_DIR.'Classes/Api/Gestion_licence.php';
 } else {
     define('FAND_PRO_ACTIVE', false);
 }

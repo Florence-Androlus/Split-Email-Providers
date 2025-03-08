@@ -5,7 +5,7 @@ Tags: WooCommerce, supplier, email, supplier management
 Requires at least: 5.0  
 Tested up to: 6.7  
 Requires PHP: 8.2  
-Stable tag: 1.0.5  
+Stable tag: 1.0.6  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -39,6 +39,9 @@ No, the addon does not currently include options to customize the email message 
 2. **Email to supplier** – 📨 Example of an email sent to suppliers for a specific order.  
 
 == Changelog ==
+
+= 1.0.6 =
+* Fix minor bugs screen
 
 = 1.0.5 =
 * Fix minor bugs

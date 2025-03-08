@@ -180,14 +180,14 @@ class FANDSettingsPage {
 			wp_die(esc_html__('Échec de la vérification de sécurité.', 'split-email-providers'));
 		}
 
-		echo '<div style="margin-top:5em;">';	
-			echo '<div style="display: none;">';
-				echo '<a href="https://fan-develop.fr/Split-email-providers/">Création de plugin custom php MySQL Javasript Gestion des envois d\'emails aux fournisseurs.</a>';
-			echo '</div>';
-			// Inclure le tableau des fournisseurs en vuejs
-			echo '<div id="app" style="margin-top:5em;">';
-			echo '</div>';
+		echo '<div style="display: none;">';
+			echo '<a href="https://fan-develop.fr/Split-email-providers/">Création de plugin custom php MySQL Javasript Gestion des envois d\'emails aux fournisseurs.</a>';
 		echo '</div>';
+		echo '<div class="div_saut_ligne" style="height:50px;"></div>';
+		// Inclure le tableau des fournisseurs en vuejs
+		echo '<div id="app">';
+		echo '</div>';
+
 	}
 
 	// Fonction pour les paiements par chèque
@@ -207,7 +207,14 @@ class FANDSettingsPage {
 	function envoyer_email_fournisseur_apres_paiement($order_id) {
 
 		global $wpdb;
-
+		if (is_plugin_active(FAND_PRO_PLUGIN)) {
+			$show_price_column = get_option('split_email_add_price');
+			$send_shop_address = get_option('split_email_send_shop_address');
+		}
+		else{
+			$show_price_column = 0;
+			$send_shop_address = 0;
+		}
 		// Récupère la commande
 		$order = wc_get_order($order_id);
 
@@ -244,13 +251,14 @@ class FANDSettingsPage {
 			$product_id = $item->get_product_id();
 			$productcap = $item->get_variation_id() ? $item->get_variation_id() : $product_id;
 			$product = wc_get_product($product_id);
-	
+
 			if (!$product) {
 				continue;
 			}
 	
 			// Récupérer le code GTIN/EAN
 			$gtin = get_post_meta($productcap, '_global_unique_id', true);
+			$price = $product->get_price();
 
 			// Récupère les termes liés à l'attribut 'pa_fournisseur'
 			$terms = get_the_terms($product_id, FAND_FOURNISSEURS_ATTRIBUT);
@@ -282,7 +290,8 @@ class FANDSettingsPage {
 				$produits_par_fournisseur[$fournisseur_email]['produits'][] = [
 					'nom' => $item->get_name(),
 					'quantite' => $item->get_quantity(),
-					'gtin' => $gtin
+					'gtin' => $gtin,
+					'price' => $price
 				];
 			} else {
 				continue;

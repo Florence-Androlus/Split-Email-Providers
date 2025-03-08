@@ -46,15 +46,17 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 							<th>Quantité</th>
 
-							<th>Code GTIN/EAN</th>
-
-						</tr>
+							<th>Code GTIN/EAN</th>';
+						error_log($show_price_column);
+						if ($show_price_column==1) {
+							$email_body .= '<th>Prix</th>';
+						}
+							
+							$email_body .= '</tr>
 
 					</thead>
 
 					<tbody>';
-
-	
 
 			foreach ($produits as $produit) {
 
@@ -62,14 +64,17 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 				<tr>
 
-					<td>' . $produit['nom'] . '</td>
+					<td>' . esc_html($produit['nom']) . '</td>
 
-					<td>' . $produit['quantite'] . '</td>
+					<td>' . intval($produit['quantite']) . '</td>
 
-					<td>' . ($produit['gtin'] ? $produit['gtin'] : 'N/A') . '</td>
-
-				</tr>';
-
+					<td>' . (!empty($produit['gtin']) ? esc_html($produit['gtin']) : 'N/A') . '</td>';
+				
+					if ($show_price_column==1) {
+						$email_body .= '<td>' . (!empty($produit['price']) ? esc_html($produit['price']) : 'N/A') . '</td>';
+					}
+			
+				$email_body .= '</tr>';
 			}
 
 			$email_body .= '
@@ -78,11 +83,16 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 				</table>
 
-				<br>
+				<br>';
 
-				<p><strong>Adresse de livraison :</strong><br>' . $shipping_address . '</p>
+				if ($send_shop_address==1) {
+					$email_body .= '<p><strong>Adresse de livraison :</strong><br>' . $shop_address . '</p>';
+				}
+				else{
+					$email_body .= '<p><strong>Adresse de livraison :</strong><br>' . $shipping_address . '</p>';
+				}
 
-				<br>
+				$email_body .= '<br>
 
 				<p>Merci de traiter cette commande rapidement.</p>
 

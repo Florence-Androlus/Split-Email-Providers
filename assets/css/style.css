@@ -7,6 +7,14 @@ body {
     background-color: #f8f9fa; /* Optionnel : couleur de fond */
 }
 
+#wpwrap {
+    height: 100%!important;
+}
+
+#wpfooter {
+    position: relative!important; 
+}
+
 .div_conteneur_parent {
     display: flex;
     justify-content: center; /* Centre le contenu horizontalement */

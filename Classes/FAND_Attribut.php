@@ -24,7 +24,7 @@ class FAND_Attribut {
     }
 
     // Fonction pour ajouter des termes à l'attribut
-    static function add_term_attribut($slug,$term) {
+    /*static function add_term_attribut($slug,$term) {
 
         // Vérifier si le terme existe déjà
         $term_id = term_exists($term, sanitize_title($slug));
@@ -37,7 +37,55 @@ class FAND_Attribut {
         if ($term_id==null) {
            return wp_insert_term($term, $slug,$args);
         }
+    }*/
+    static function add_term_attribut($taxonomy, $term, $commercant_id = null) {
+        global $wpdb;
+        error_log('taxonomy :' . $taxonomy);
+        error_log('term :' . $term);
+        error_log('commercant_id :' . $commercant_id);
+
+        // Vérifier si le terme existe déjà
+        $term_check = term_exists($term, $taxonomy);
+        $args = ['description' => $term];
+
+        if (!$term_check) {
+            $insert_result = wp_insert_term($term, sanitize_title($taxonomy), $args);
+
+            if (is_wp_error($insert_result)) {
+                error_log('Erreur wp_insert_term : ' . $insert_result->get_error_message());
+                return null; // ou false selon ta logique
+            }
+
+            $term_id = $insert_result['term_id'];
+        } else {
+            // $term_check peut être int ou array selon contexte
+            $term_id = is_array($term_check) ? $term_check['term_id'] : $term_check;
+        }
+
+        error_log('term_id :' . $term_id);
+
+        // Si WCFM est actif, on ajoute la relation commerçant <-> terme
+        if (FAND_MARKET_ACTIVE && $commercant_id !== null) {
+            $table_relation = FAND_COMMERCANTS_TERMS;
+            error_log('table_relation :' . $table_relation);
+
+            $exists = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM $table_relation WHERE commercant_id = %d AND term_id = %d",
+                $commercant_id,
+                $term_id
+            ));
+
+            if (!$exists) {
+                $wpdb->insert($table_relation, [
+                    'commercant_id' => $commercant_id,
+                    'term_id'       => $term_id,
+                ]);
+            }
+        }
+
+        return $term_id;
     }
+
 
     // Fonction pour mettre à jour un terme dans l'attribut
     static function update_term_attribut($slug, $term, $new_term_data) {

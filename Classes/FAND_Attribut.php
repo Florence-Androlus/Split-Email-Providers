@@ -127,20 +127,30 @@ class FAND_Attribut {
 
     // Fonction pour supprimer des termes de l'attribut
     static function delete_term_attribut($slug, $term) {
+        $taxonomy = sanitize_title($slug);
+
+        error_log("🔎 Suppression terme dans taxonomie '$taxonomy' pour valeur : " . print_r($term, true));
+
         // Vérifier si le terme existe
-        $term_id = term_exists($term, sanitize_title($slug));
+        $term_id = term_exists($term, $taxonomy);
 
-        // Si le terme existe, le supprimer
-        if ($term_id) {
-            // Supprimer le terme de la taxonomie spécifiée
-            $result = wp_delete_term($term_id['term_id'], sanitize_title($slug));
+        if (!$term_id) {
+            error_log("❌ Aucun terme trouvé pour '$term' dans taxonomie '$taxonomy'");
+            return false;
+        }
 
-            // Vérifier si la suppression a échoué
-            if (is_wp_error($result)) {
-                return $result; // Retourner l'erreur si la suppression échoue
-            } else {
-                return true; // Retourner vrai si la suppression a réussi
-            }
-        } 
+        error_log("✅ Terme trouvé : ID=" . $term_id['term_id'] . " (taxonomy=$taxonomy)");
+
+        // Supprimer le terme de la taxonomie spécifiée
+        $result = wp_delete_term($term_id['term_id'], $taxonomy);
+
+        if (is_wp_error($result)) {
+            error_log("⚠️ Erreur suppression terme ID=" . $term_id['term_id'] . " : " . $result->get_error_message());
+            return $result; // Retourner l'erreur si la suppression échoue
+        } else {
+            error_log("🗑️ Terme ID=" . $term_id['term_id'] . " supprimé avec succès.");
+            return true; // Retourner vrai si la suppression a réussi
+        }
     }
+
 }

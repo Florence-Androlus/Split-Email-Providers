@@ -34,66 +34,6 @@ class Database {
         dbDelta($sql);
     }
 
-    /*static function add_fournisseur($data)
-    {    
-        global $wpdb;
-        $alert=[];
-
-        // Récupérer les données du formulaire
-        $data = [
-            'fournisseur_id' => isset($data['fournisseurId']) ? intval($data['fournisseurId']) : 0,
-            'nom' => isset($data['nom']) ? sanitize_text_field($data['nom']) : '',
-            'adresse' => isset($data['adresse']) ? stripslashes(sanitize_text_field($data['adresse'])) : '',
-            'cp' => isset($data['cp']) ? sanitize_text_field($data['cp']) : '',
-            'ville' => isset($data['ville']) ? stripslashes(sanitize_text_field($data['ville'])) : '',
-            'pays' => isset($data['pays']) ? sanitize_text_field($data['pays']) : '',
-            'email' => isset($data['email']) ? sanitize_email($data['email']) : '',
-            'telephone' => isset($data['telephone']) ? sanitize_text_field($data['telephone']) : ''
-        ];
-        extract($data); // Pour rendre les variables disponibles séparément
-
-        // Vérifier si le fournisseur existe déjà
-        $existing_supplier = $wpdb->get_row($wpdb->prepare( "SELECT * FROM %i WHERE email = %s OR nom = %s",FAND_FOURNISSEURS_TABLE,  $email,  $nom ));
-
-        if ($existing_supplier) {
-            // Fournisseur existe déjà
-            $message = 'Le fournisseur existe déjà.';
-            $message_type = 'error'; // Indicateur d'erreur
-
-        } 
-        else {
-            // Insérer dans la table des fournisseurs
-            $result = $wpdb->insert(FAND_FOURNISSEURS_TABLE, array(
-                'nom' => $nom,
-                'adresse' => $adresse,
-                'cp' => $cp,
-                'ville' => $ville,
-                'pays' => $pays,
-                'email' => $email,
-                'telephone' => $telephone,
-            ));
-
-            if ($result) {
-                // Appel de la fonction pour ajouter le fournisseur comme term de l'attribut fournisseur
-                $term_result = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom);
-
-                if (is_wp_error($term_result)) {
-                    $message = "Fournisseur ajouté, mais erreur lors de l'ajout du term.";
-                    $message_type = 'error';
-                } 
-                else {
-                    $message = 'Fournisseur ajouté avec succès !';
-                    $message_type = 'success'; // Indicateur de succès
-                }
-            } 
-            else {
-                $message = "Erreur lors de l'ajout du fournisseur.";
-                $message_type = 'error'; // Indicateur d'erreur
-            }
-        }
-        $alert=['message'=>$message,'message_type'=>$message_type];
-        return $alert;
-    }*/
     static function add_fournisseur($data)
     {
         global $wpdb;
@@ -221,141 +161,115 @@ class Database {
 
     static public function update_fournisseur($data){
         global $wpdb;
-        $alert=[];
-        error_log(print_r($data, true));
 
-        // Récupérer les données du formulaire
-        $data= [
-            'fournisseur_id' => isset($data['fournisseur_id']) ? intval($data['fournisseur_id']) : 0,
-            'nom' => isset($data['nom']) ? sanitize_text_field($data['nom']) : '',
-            'adresse' => isset($data['adresse']) ? stripslashes(sanitize_text_field($data['adresse'])) : '',
-            'cp' => isset($data['cp']) ? sanitize_text_field($data['cp']) : '',
-            'ville' => isset($data['ville']) ? stripslashes(sanitize_text_field($data['ville'])) : '',
-            'pays' => isset($data['pays']) ? sanitize_text_field($data['pays']) : '',
-            'email' => isset($data['email']) ? sanitize_email($data['email']) : '',
-            'telephone' => isset($data['telephone']) ? sanitize_text_field($data['telephone']) : ''
-        ];
-
-        extract($data); // Pour rendre les variables disponibles séparément
-
-        // Récupérer l'ancien nom pour vérifier le changement
-        $ancien_fournisseur = $wpdb->get_row($wpdb->prepare("SELECT nom FROM %i WHERE id = %d",FAND_FOURNISSEURS_TABLE,$fournisseur_id));
-        $ancien_nom = '';
-        if(isset($ancien_fournisseur->nom)){
-        $ancien_nom = $ancien_fournisseur->nom;
-        }
-
-        error_log('fournisseur_id : '.$fournisseur_id);
-        //error_log($ancien_nom);
-        // Si MarketPlace actif
-        if (FAND_MARKET_ACTIVE) {
-            // Mettre à jour les infos globales (nom et email) dans la table fournisseurs
-            $result = $wpdb->update(FAND_FOURNISSEURS_TABLE, [
-                'nom'  => $nom,
-                'email' => $email,
-            ], ['id' => $fournisseur_id]);
-
-            //recupere l'id commercant
-            $commercant_id = get_current_user_id();
-            // Puis mettre à jour ou insérer la liaison commerçant / fournisseur via REPLACE
-            $result_liaison = $wpdb->update(FAND_COMMERCANTS_FOURNISSEURS_TABLE, [
-                'adresse'        => $adresse,
-                'cp'             => $cp,
-                'ville'          => $ville,
-                'pays'           => $pays,
-                'telephone'      => $telephone,
-            ],
-            ['fournisseur_id' => $fournisseur_id,'commercant_id'  => $commercant_id,]);
-
-        } 
-        else {
-            // Mettre à jour le fournisseur
-            $result = $wpdb->update(FAND_FOURNISSEURS_TABLE, array(
-                'nom' => $nom,
-                'adresse' => $adresse,
-                'cp' => $cp,
-                'ville' => $ville,
-                'pays' => $pays,
-                'email' => $email,
-                'telephone' => $telephone,
-            ), array('id' => $fournisseur_id));
-        }
-
-        if (isset($result) && $result !== false) {
-            $message = 'Fournisseur mis à jour avec succès !';
-            $message_type = 'success';
-            // Si le nom a changé, mettre à jour le term associé
-            if ($ancien_nom !== $nom) {
-                // Récupérer l'ID du term associé au fournisseur
-                $term = get_term_by('name', $ancien_nom, FAND_FOURNISSEURS_ATTRIBUT); 
-
-                if ($term) {
-                    // Appeler la méthode statique de AttributManager pour mettre à jour le term
-                    $result = FAND_Attribut::update_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $ancien_nom, [
-                        'name' => $nom,
-                        'slug' => sanitize_title($nom),
-                    ]);
-                }
-            }
-        } else {
-            $message = 'Erreur lors de la mise à jour du fournisseur.';
-            $message_type = 'error';
-        }
-
-        $alert=['message'=>$message,'message_type'=>$message_type];
-        return $alert;
-    }
-    /*static public function update_fournisseur($data)
-    {
-        global $wpdb;
-        $alert=[];
-
-        // Récupérer les données du formulaire
-        $data= [
+        $data = [
             'fournisseur_id' => isset($data['id']) ? intval($data['id']) : 0,
-            'nom' => isset($data['nom']) ? sanitize_text_field($data['nom']) : '',
-            'adresse' => isset($data['adresse']) ? stripslashes(sanitize_text_field($data['adresse'])) : '',
-            'cp' => isset($data['cp']) ? sanitize_text_field($data['cp']) : '',
-            'ville' => isset($data['ville']) ? stripslashes(sanitize_text_field($data['ville'])) : '',
-            'pays' => isset($data['pays']) ? sanitize_text_field($data['pays']) : '',
-            'email' => isset($data['email']) ? sanitize_email($data['email']) : '',
-            'telephone' => isset($data['telephone']) ? sanitize_text_field($data['telephone']) : ''
+            'nom'            => isset($data['nom']) ? sanitize_text_field($data['nom']) : '',
+            'adresse'        => isset($data['adresse']) ? stripslashes(sanitize_text_field($data['adresse'])) : '',
+            'cp'             => isset($data['cp']) ? sanitize_text_field($data['cp']) : '',
+            'ville'          => isset($data['ville']) ? stripslashes(sanitize_text_field($data['ville'])) : '',
+            'pays'           => isset($data['pays']) ? sanitize_text_field($data['pays']) : '',
+            'email'          => isset($data['email']) ? sanitize_email($data['email']) : '',
+            'telephone'      => isset($data['telephone']) ? sanitize_text_field($data['telephone']) : ''
         ];
 
-        extract($data); // Pour rendre les variables disponibles séparément
+        extract($data);
 
-        // Récupérer l'ancien nom pour vérifier le changement
-        $ancien_fournisseur = $wpdb->get_row($wpdb->prepare("SELECT nom FROM %i WHERE id = %d",FAND_FOURNISSEURS_TABLE,$fournisseur_id));
-        $ancien_nom = '';
-        if(isset($ancien_fournisseur->nom)){
-        $ancien_nom = $ancien_fournisseur->nom;
+        // Ancien nom (pour update du term)
+        $ancien_fournisseur = $wpdb->get_row(
+            $wpdb->prepare("SELECT nom FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id = %d", $fournisseur_id)
+        );
+        $ancien_nom = $ancien_fournisseur ? $ancien_fournisseur->nom : '';
+
+        if (FAND_MARKET_ACTIVE) {
+            // maj infos globales
+            $result = $wpdb->update(
+                FAND_FOURNISSEURS_TABLE,
+                [
+                    'nom'   => $nom,
+                    'email' => $email,
+                ],
+                ['id' => $fournisseur_id]
+            );
+
+            // maj relation vendeur/fournisseur
+            $commercant_id = get_current_user_id();
+
+            // Vérifie si la liaison existe déjà
+            $liaison_exist = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM " . FAND_COMMERCANTS_FOURNISSEURS_TABLE . " 
+                    WHERE fournisseur_id = %d AND commercant_id = %d",
+                    $fournisseur_id,
+                    $commercant_id
+                )
+            );
+
+            if ($liaison_exist) {
+                // UPDATE
+                $result_liaison = $wpdb->update(
+                    FAND_COMMERCANTS_FOURNISSEURS_TABLE,
+                    [
+                        'adresse'   => $adresse,
+                        'cp'        => $cp,
+                        'ville'     => $ville,
+                        'pays'      => $pays,
+                        'telephone' => $telephone,
+                    ],
+                    [
+                        'fournisseur_id' => $fournisseur_id,
+                        'commercant_id'  => $commercant_id,
+                    ]
+                );
+            } else {
+                // INSERT (première fois qu’on lie ce fournisseur à ce vendeur)
+                $result_liaison = $wpdb->insert(
+                    FAND_COMMERCANTS_FOURNISSEURS_TABLE,
+                    [
+                        'fournisseur_id' => $fournisseur_id,
+                        'commercant_id'  => $commercant_id,
+                        'adresse'        => $adresse,
+                        'cp'             => $cp,
+                        'ville'          => $ville,
+                        'pays'           => $pays,
+                        'telephone'      => $telephone,
+                    ]
+                );
+            }
+
+        } else {
+            // Mode simple → mise à jour directe
+            $result = $wpdb->update(
+                FAND_FOURNISSEURS_TABLE,
+                [
+                    'nom'       => $nom,
+                    'adresse'   => $adresse,
+                    'cp'        => $cp,
+                    'ville'     => $ville,
+                    'pays'      => $pays,
+                    'email'     => $email,
+                    'telephone' => $telephone,
+                ],
+                ['id' => $fournisseur_id]
+            );
         }
-        //error_log($ancien_nom);
-        // Mettre à jour le fournisseur
-        $result = $wpdb->update(FAND_FOURNISSEURS_TABLE, array(
-            'nom' => $nom,
-            'adresse' => $adresse,
-            'cp' => $cp,
-            'ville' => $ville,
-            'pays' => $pays,
-            'email' => $email,
-            'telephone' => $telephone,
-        ), array('id' => $fournisseur_id));
 
-        if ($result !== false) {
+        // Retour messages
+        if ((isset($result) && $result !== false) || (isset($result_liaison) && $result_liaison !== false)) {
             $message = 'Fournisseur mis à jour avec succès !';
             $message_type = 'success';
-            // Si le nom a changé, mettre à jour le term associé
-            if ($ancien_nom !== $nom) {
-                // Récupérer l'ID du term associé au fournisseur
-                $term = get_term_by('name', $ancien_nom, FAND_FOURNISSEURS_ATTRIBUT); 
 
+            if ($ancien_nom && $ancien_nom !== $nom) {
+                $term = get_term_by('name', $ancien_nom, FAND_FOURNISSEURS_ATTRIBUT); 
                 if ($term) {
-                    // Appeler la méthode statique de AttributManager pour mettre à jour le term
-                    $result = FAND_Attribut::update_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $ancien_nom, [
-                        'name' => $nom,
-                        'slug' => sanitize_title($nom),
-                    ]);
+                    FAND_Attribut::update_term_attribut(
+                        FAND_FOURNISSEURS_ATTRIBUT,
+                        $ancien_nom,
+                        [
+                            'name' => $nom,
+                            'slug' => sanitize_title($nom),
+                        ]
+                    );
                 }
             }
         } else {
@@ -363,9 +277,8 @@ class Database {
             $message_type = 'error';
         }
 
-        $alert=['message'=>$message,'message_type'=>$message_type];
-        return $alert;
-    }*/
+        return ['message'=>$message,'message_type'=>$message_type];
+    }
 
     static function get_all_fournisseurs() {
         global $wpdb;
@@ -375,16 +288,13 @@ class Database {
 
         // Vérif marketplace
         if (!defined('FAND_MARKET_ACTIVE') || !FAND_MARKET_ACTIVE) {
-            error_log("[FAND] Marketplace INACTIVE → récupération de TOUS les fournisseurs");
             $results = $wpdb->get_results("SELECT * FROM $table_fournisseurs");
-            error_log("[FAND] Fournisseurs récupérés (count=" . count($results) . ")");
             return $results;
         }
 
         // Marketplace active
         $user_id = get_current_user_id();
         $user    = get_userdata($user_id);
-        error_log("[FAND] Marketplace ACTIVE → user_id=$user_id, roles=" . implode(',', (array)$user->roles));
 
         // User est vendeur → récupérer uniquement SES fournisseurs
         $query = $wpdb->prepare("
@@ -401,106 +311,137 @@ class Database {
             WHERE r.commercant_id = %d
         ", $user_id);
 
-        error_log("[FAND] Requête SQL (vendeur) : $query");
-
         $results = $wpdb->get_results($query);
-        error_log("[FAND] Fournisseurs trouvés pour vendeur $user_id (count=" . count($results) . ")");
         return $results;
 
     }
 
-    /*static function get_all_fournisseurs(){
-        global $wpdb;
-        $fournisseurs = $wpdb->get_results($wpdb->prepare("SELECT * FROM %i", FAND_FOURNISSEURS_TABLE));
-        return $fournisseurs;
-    }*/
-
-    /*static function delete_fournisseur($POST)
-    {
-        global $wpdb;
-        $alert=[];
-
-        // Suppression d'un fournisseur
-        $fournisseur_id = intval($POST['fournisseur_id']); // Récupérer l'ID du fournisseur à supprimer
-
-        // Récupérer le fournisseur pour obtenir le nom du term
-        $fournisseur = $wpdb->get_row($wpdb->prepare("SELECT nom FROM %i WHERE id = %d",FAND_FOURNISSEURS_TABLE, $fournisseur_id));
-
-        if ($fournisseur) {
-            // Supprimer le term associé
-            $term_name = $fournisseur->nom; // Nom du term à supprimer
-
-            // Appeler la fonction pour supprimer le term
-            $result = FAND_Attribut::delete_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $term_name);
-            if (is_wp_error($result)) {
-                $message = 'Erreur lors de la suppression du term : ' . $result->get_error_message();
-                $message_type = 'error'; // Indicateur d'erreur
-            } 
-            else {
-                $message = 'Term supprimé avec succès.';
-                $message_type = 'success'; // Indicateur de succès
-            }
-        }
-
-        // Supprimer le fournisseur de la base de données
-        $deleted = $wpdb->delete(FAND_FOURNISSEURS_TABLE, array('id' => $fournisseur_id));
-
-        if ($deleted) {
-            $message = 'Fournisseur supprimé avec succès.';
-            $message_type = 'success'; // Indicateur de succès
-        } 
-        else {
-            $message = 'Erreur lors de la suppression du fournisseur.';
-            $message_type = 'error'; // Indicateur d'erreur
-        }
-
-        $alert=['message'=>$message,'message_type'=>$message_type];
-        return $alert;
-    }*/
     static function delete_fournisseur($POST){
         global $wpdb;
-        $alert = [];
+
         $message = '';
         $message_type = '';
 
-        $fournisseur = $POST['fournisseur'];
+        // 1. Récupération ID fournisseur
+        if (isset($POST['fournisseur'])) {
+            $fournisseur = $POST['fournisseur'];
+            $fournisseur_id = FAND_MARKET_ACTIVE
+                ? (isset($fournisseur['fournisseur_id']) ? intval($fournisseur['fournisseur_id']) : 0)
+                : (isset($fournisseur['id']) ? intval($fournisseur['id']) : 0);
+            error_log('✅ Fournisseur reçu : ' . print_r($fournisseur, true));
+        } elseif (isset($POST['fournisseur_id'])) {
+            $fournisseur_id = intval($POST['fournisseur_id']);
+            error_log("✅ Fournisseur reçu directement avec fournisseur_id = $fournisseur_id");
+        } else {
+            error_log('❌ Aucun fournisseur trouvé dans POST : ' . print_r($POST, true));
+            return ['message' => 'Fournisseur invalide.', 'message_type' => 'error'];
+        }
 
-        $fournisseur_id = FAND_MARKET_ACTIVE
-            ? (isset($fournisseur['fournisseur_id']) ? intval($fournisseur['fournisseur_id']) : 0)
-            : (isset($fournisseur['id']) ? intval($fournisseur['id']) : 0);
+        error_log("➡️ Tentative suppression fournisseur ID: $fournisseur_id");
+
+        if (!$fournisseur_id) {
+            return ['message' => 'Fournisseur invalide.', 'message_type' => 'error'];
+        }
 
         if (FAND_MARKET_ACTIVE) {
-            error_log('FAND_MARKET_ACTIVE');
-
-            // Récupérer l'ID du commerçant connecté
             $commercant_id = get_current_user_id();
+            error_log("ℹ Commerçant courant : $commercant_id");
+            // Récupérer nom avant suppression
+            $fournisseur_data = $wpdb->get_row(
+                $wpdb->prepare("SELECT id, nom FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id=%d", $fournisseur_id),
+                ARRAY_A
+            );
+            error_log("ℹ Données fournisseur avant suppression : " . print_r($fournisseur_data, true));
+            $fournisseur_nom = $fournisseur_data['nom'];
 
-            // Supprimer uniquement la relation commerçant-fournisseur
-            $deleted = $wpdb->delete(
+            // Récupérer le terme global du fournisseur
+            $term = get_term_by('name', $fournisseur_nom, FAND_FOURNISSEURS_ATTRIBUT);
+
+            if ($term) {
+                $term_id = intval($term->term_id);
+                error_log("ℹ Term_id à supprimer pour ce commerçant : $term_id");
+
+                // Supprimer la relation uniquement pour ce commerçant
+                $deleted_term_rel = $wpdb->delete(
+                    FAND_COMMERCANTS_TERMS,
+                    [
+                        'commercant_id' => $commercant_id,
+                        'term_id'       => $term_id
+                    ]
+                );
+                error_log("🗑️ Suppression relation commercant=$commercant_id ↔ term_id=$term_id : " . ($deleted_term_rel ? "OK" : "ECHEC"));
+            } else {
+                error_log("ℹ Aucun terme trouvé pour '$fournisseur_nom'");
+            }
+
+            // 2. Supprimer relation commercant ↔ fournisseur
+            $deleted_rel = $wpdb->delete(
                 FAND_COMMERCANTS_FOURNISSEURS_TABLE,
                 [
-                    'commercant_id' => $commercant_id,
+                    'commercant_id'  => $commercant_id,
                     'fournisseur_id' => $fournisseur_id
                 ]
             );
-        } else {
-            // Supprimer complètement le fournisseur s’il n’y a pas de multi-vendeur
-            $deleted = $wpdb->delete(
-                FAND_FOURNISSEURS_TABLE,
-                ['id' => $fournisseur_id]
+            error_log("🗑️ Suppression relation commercant-fournisseur : " . ($deleted_rel ? "OK" : "ECHEC"));
+
+            // 4. Vérifier relations restantes
+            $relations = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM " . FAND_COMMERCANTS_FOURNISSEURS_TABLE . " WHERE fournisseur_id=%d",
+                    $fournisseur_id
+                )
             );
-        }
+            error_log("ℹ Nombre de relations restantes pour ce fournisseur : $relations");
 
-        if ($deleted) {
-            $message = 'Fournisseur supprimé avec succès.';
-            $message_type = 'success';
+            if (!$relations) {
+                // Récupérer nom avant suppression
+                $fournisseur_data = $wpdb->get_row(
+                    $wpdb->prepare("SELECT id, nom FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id=%d", $fournisseur_id),
+                    ARRAY_A
+                );
+                error_log("ℹ Données fournisseur avant suppression : " . print_r($fournisseur_data, true));
+
+                if ($fournisseur_data) {
+                    $fournisseur_nom = $fournisseur_data['nom'];
+
+                    // Supprimer fournisseur global
+                    $deleted_fourn = $wpdb->delete(FAND_FOURNISSEURS_TABLE, ['id' => $fournisseur_id]);
+                    error_log("🗑️ Fournisseur global supprimé : " . ($deleted_fourn ? "OK" : "ECHEC"));
+
+                    // Supprimer toutes les relations term restantes
+                    $deleted_term_all = $wpdb->delete(
+                        FAND_COMMERCANTS_TERMS,
+                        ['term_id' => $fournisseur_id]
+                    );
+                    error_log("🗑️ Relations restantes dans FAND_COMMERCANTS_TERMS supprimées : " . ($deleted_term_all ? "OK" : "ECHEC"));
+
+                    // Supprimer terme global
+                    $term = get_term_by('name', $fournisseur_nom, FAND_FOURNISSEURS_ATTRIBUT);
+                    if ($term) {
+                        $result_delete_term = wp_delete_term($term->term_id, FAND_FOURNISSEURS_ATTRIBUT);
+                        error_log("🗑️ Suppression terme global : " . ($result_delete_term && !is_wp_error($result_delete_term) ? "OK" : "ECHEC"));
+                    } else {
+                        error_log("ℹ Aucun terme global trouvé pour '$fournisseur_nom'");
+                    }
+                }
+            }
+
         } else {
-            $message = 'Erreur lors de la suppression du fournisseur.';
-            $message_type = 'error';
+            // Mode non-marketplace
+            $deleted_fourn = $wpdb->delete(FAND_FOURNISSEURS_TABLE, ['id' => $fournisseur_id]);
+            error_log("🗑️ Fournisseur supprimé (non-marketplace) : " . ($deleted_fourn ? "OK" : "ECHEC"));
+
+            $term = get_term($fournisseur_id, FAND_FOURNISSEURS_ATTRIBUT);
+            if ($term && !is_wp_error($term)) {
+                wp_delete_term($fournisseur_id, FAND_FOURNISSEURS_ATTRIBUT);
+                error_log("🗑️ Term global supprimé (non-marketplace) : $fournisseur_id");
+            }
         }
 
-        $alert=['message'=>$message,'message_type'=>$message_type];
-        return $alert;
-}
+        $message = 'Fournisseur supprimé avec succès.';
+        $message_type = 'success';
+
+        return ['message' => $message, 'message_type' => $message_type];
+    }
 
 }

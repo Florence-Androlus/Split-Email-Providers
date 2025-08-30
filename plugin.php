@@ -234,6 +234,7 @@ class FANDSettingsPage {
 			return;
 		}
 
+
 		// Adresse email de l'administrateur
 		$admin_email = get_option('admin_email');
 
@@ -266,7 +267,9 @@ class FANDSettingsPage {
 			if (!$product) {
 				continue;
 			}
-	
+			
+			$info = self::fand_get_vendor_and_supplier_info($product_id);
+		
 			// Récupérer le code GTIN/EAN
 			$gtin = get_post_meta($productcap, '_global_unique_id', true);
 			$price = $product->get_price();
@@ -333,6 +336,162 @@ class FANDSettingsPage {
 			$mail_sent = wp_mail($fournisseur_email, $email_subject, $email_body, $headers);
 
 		}
+	}
+
+
+	/**
+	 * Récupère vendeur (WCFM) + fournisseur (tables custom) pour un produit donné
+	 *
+	 * @param int $product_id
+	 * @return array|null
+	 */
+	function fand_get_vendor_and_supplier_info($product_id) {
+		global $wpdb;
+
+		// Tables (fallback si constantes non définies)
+		$tbl_fournisseurs = defined('FAND_FOURNISSEURS_TABLE') ? FAND_FOURNISSEURS_TABLE : $wpdb->prefix . 'fand_fournisseurs';
+		$tbl_relations    = defined('FAND_COMMERCANTS_FOURNISSEURS_TABLE') ? FAND_COMMERCANTS_FOURNISSEURS_TABLE : $wpdb->prefix . 'fand_commercants_fournisseurs';
+
+		// === 1) Vendeur WCFM (avec fallback Woo principal) ===
+		$vendor_id = get_post_field('post_author', $product_id);
+		if (!$vendor_id) {
+			error_log("❌ [fand_get_vendor_and_supplier_info] Aucun vendor pour produit $product_id");
+			return null;
+		}
+
+		$vendor_shop_name = get_user_meta($vendor_id, 'wcfmmp_store_name', true);
+		$vendor_user      = get_userdata($vendor_id);
+		$profile_settings = get_user_meta($vendor_id, '_wcfmmp_profile_settings', true);
+		$vendor_logo_meta = (is_array($profile_settings) && !empty($profile_settings['gravatar'])) ? $profile_settings['gravatar'] : null;
+
+		$vendor_shop_email   = $vendor_user ? $vendor_user->user_email : '';
+		$vendor_shop_logo    = $vendor_logo_meta ?: get_site_icon_url();
+		$vendor_shop_address = get_user_meta($vendor_id, '_wcfmmp_store_address', true);
+
+		// Fallback si "Boutique sans nom" ou nom vide
+		if (empty($vendor_shop_name) || $vendor_shop_name === 'Boutique sans nom') {
+			$vendor_shop_name  = get_bloginfo('name');
+			$vendor_shop_email = get_option('admin_email');
+			$vendor_shop_logo  = get_site_icon_url();
+
+			$default_country   = get_option('woocommerce_default_country');
+			$country_code      = $default_country && strpos($default_country, ':') !== false ? explode(':', $default_country)[0] : $default_country;
+			$country_name      = (function_exists('WC') && isset(WC()->countries->countries[$country_code])) ? WC()->countries->countries[$country_code] : $country_code;
+
+			$vendor_shop_address = trim(sprintf(
+				'%s, %s %s, %s',
+				(string) get_option('woocommerce_store_address'),
+				(string) get_option('woocommerce_store_postcode'),
+				(string) get_option('woocommerce_store_city'),
+				(string) $country_name
+			));
+
+			error_log("➡️ [Vendor] Fallback Woo principal : Nom={$vendor_shop_name}, Email={$vendor_shop_email}");
+		} else {
+			// Si adresse WCFM est un array, formater
+			if (is_array($vendor_shop_address)) {
+				$parts = array_filter([
+					$vendor_shop_address['street_1'] ?? '',
+					$vendor_shop_address['street_2'] ?? '',
+					($vendor_shop_address['postcode'] ?? '') . ' ' . ($vendor_shop_address['city'] ?? ''),
+					$vendor_shop_address['country'] ?? ''
+				]);
+				$vendor_shop_address = trim(implode(', ', array_map('trim', $parts)), ', ');
+			}
+			error_log("✅ [Vendor] ID={$vendor_id}, Nom={$vendor_shop_name}, Email={$vendor_shop_email}");
+		}
+
+		// === 2) Terme fournisseur du PRODUIT ===
+		$terms = get_the_terms($product_id, FAND_FOURNISSEURS_ATTRIBUT);
+		if (!$terms || is_wp_error($terms)) {
+			error_log("❌ [Supplier] Aucun terme fournisseur pour produit $product_id");
+			$result = [
+				'vendeur' => [
+					'id'      => $vendor_id,
+					'nom'     => $vendor_shop_name,
+					'email'   => $vendor_shop_email,
+					'logo'    => $vendor_shop_logo,
+					'adresse' => $vendor_shop_address,
+				],
+				'fournisseur' => null
+			];
+			error_log("📦 Résultat final pour produit $product_id : " . print_r($result, true));
+			return $result;
+		}
+
+		$term = reset($terms);
+		$term_id   = (int) $term->term_id;
+		$term_name = $term->name;
+		error_log("➡️ [Supplier] Terme trouvé : ID={$term_id}, Nom={$term_name}");
+
+		// === 3) Fournisseur global par NOM ===
+		$fournisseur = $wpdb->get_row(
+			$wpdb->prepare("SELECT * FROM {$tbl_fournisseurs} WHERE nom = %s", $term_name)
+		);
+
+		if (!$fournisseur) {
+			error_log("❌ [Supplier] Aucun fournisseur global nommé '{$term_name}'");
+			$result = [
+				'vendeur' => [
+					'id'      => $vendor_id,
+					'nom'     => $vendor_shop_name,
+					'email'   => $vendor_shop_email,
+					'logo'    => $vendor_shop_logo,
+					'adresse' => $vendor_shop_address,
+				],
+				'fournisseur' => null
+			];
+			error_log("📦 Résultat final pour produit $product_id : " . print_r($result, true));
+			return $result;
+		}
+
+		error_log("✅ [Supplier] Global trouvé : ID={$fournisseur->id}, Nom={$fournisseur->nom}, Email={$fournisseur->email}");
+
+		// === 4) Relation spécifique vendor ↔ fournisseur (override adresse/tel/note) ===
+		$relation = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT id, adresse, cp, ville, pays, telephone, note_personnelle
+				FROM {$tbl_relations}
+				WHERE commercant_id = %d AND fournisseur_id = %d
+				LIMIT 1",
+				$vendor_id,
+				$fournisseur->id
+			)
+		);
+
+		if ($relation) {
+			error_log("✅ [Relation] trouvée pour vendor {$vendor_id} ↔ fournisseur {$fournisseur->id} : " . print_r($relation, true));
+		} else {
+			error_log("ℹ️ [Relation] Aucune relation spécifique vendor {$vendor_id} ↔ fournisseur {$fournisseur->id}");
+		}
+
+		// Préparer les champs qui viennent soit de la relation (si présente) soit du fournisseur global
+		$fournisseur_data = [
+			'id'        => (int) $fournisseur->id,
+			'nom'       => (string) $fournisseur->nom,
+			'email'     => (string) $fournisseur->email,
+			'adresse'   => $relation && !empty($relation->adresse)   ? $relation->adresse   : (string) $fournisseur->adresse,
+			'cp'        => $relation && !empty($relation->cp)        ? $relation->cp        : (string) $fournisseur->cp,
+			'ville'     => $relation && !empty($relation->ville)     ? $relation->ville     : (string) $fournisseur->ville,
+			'pays'      => $relation && !empty($relation->pays)      ? $relation->pays      : (string) $fournisseur->pays,
+			'telephone' => $relation && !empty($relation->telephone) ? $relation->telephone : (string) $fournisseur->telephone,
+			'note'      => $relation->note_personnelle ?? null,
+		];
+
+		// Log complet juste avant le return
+		$final = [
+			'vendeur' => [
+				'id'      => $vendor_id,
+				'nom'     => $vendor_shop_name,
+				'email'   => $vendor_shop_email,
+				'logo'    => $vendor_shop_logo,
+				'adresse' => $vendor_shop_address,
+			],
+			'fournisseur' => $fournisseur_data
+		];
+		error_log("📦 Résultat final pour produit {$product_id} : " . print_r($final, true));
+
+		return $final;
 	}
 
 }

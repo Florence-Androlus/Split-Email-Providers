@@ -328,16 +328,16 @@ class Database {
             $fournisseur_id = FAND_MARKET_ACTIVE
                 ? (isset($fournisseur['fournisseur_id']) ? intval($fournisseur['fournisseur_id']) : 0)
                 : (isset($fournisseur['id']) ? intval($fournisseur['id']) : 0);
-            //error_log('✅ Fournisseur reçu : ' . print_r($fournisseur, true));
+            //error_log('Fournisseur reçu : ' . print_r($fournisseur, true));
         } elseif (isset($POST['fournisseur_id'])) {
             $fournisseur_id = intval($POST['fournisseur_id']);
-            //error_log("✅ Fournisseur reçu directement avec fournisseur_id = $fournisseur_id");
+            //error_log("Fournisseur reçu directement avec fournisseur_id = $fournisseur_id");
         } else {
-            //error_log('❌ Aucun fournisseur trouvé dans POST : ' . print_r($POST, true));
+            //error_log('Aucun fournisseur trouvé dans POST : ' . print_r($POST, true));
             return ['message' => 'Fournisseur invalide.', 'message_type' => 'error'];
         }
 
-        //error_log("➡️ Tentative suppression fournisseur ID: $fournisseur_id");
+        //error_log("Tentative suppression fournisseur ID: $fournisseur_id");
 
         if (!$fournisseur_id) {
             return ['message' => 'Fournisseur invalide.', 'message_type' => 'error'];
@@ -345,13 +345,13 @@ class Database {
 
         if (FAND_MARKET_ACTIVE) {
             $commercant_id = get_current_user_id();
-            //error_log("ℹ Commerçant courant : $commercant_id");
+            error_log("ℹ Commerçant courant : $commercant_id");
             // Récupérer nom avant suppression
             $fournisseur_data = $wpdb->get_row(
                 $wpdb->prepare("SELECT id, nom FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id=%d", $fournisseur_id),
                 ARRAY_A
             );
-            //error_log("ℹ Données fournisseur avant suppression : " . print_r($fournisseur_data, true));
+            error_log("ℹ Données fournisseur avant suppression : " . print_r($fournisseur_data, true));
             $fournisseur_nom = $fournisseur_data['nom'];
 
             // Récupérer le terme global du fournisseur
@@ -359,7 +359,7 @@ class Database {
 
             if ($term) {
                 $term_id = intval($term->term_id);
-                //error_log("ℹ Term_id à supprimer pour ce commerçant : $term_id");
+                error_log("ℹ Term_id à supprimer pour ce commerçant : $term_id");
 
                 // Supprimer la relation uniquement pour ce commerçant
                 $deleted_term_rel = $wpdb->delete(
@@ -369,9 +369,9 @@ class Database {
                         'term_id'       => $term_id
                     ]
                 );
-                //error_log(" Suppression relation commercant=$commercant_id ↔ term_id=$term_id : " . ($deleted_term_rel ? "OK" : "ECHEC"));
+                error_log(" Suppression relation commercant=$commercant_id ↔ term_id=$term_id : " . ($deleted_term_rel ? "OK" : "ECHEC"));
             } else {
-                error_log("ℹ Aucun terme trouvé pour '$fournisseur_nom'");
+                error_log("Aucun terme trouvé pour '$fournisseur_nom'");
             }
 
             // 2. Supprimer relation commercant ↔ fournisseur
@@ -382,7 +382,7 @@ class Database {
                     'fournisseur_id' => $fournisseur_id
                 ]
             );
-            //error_log(" Suppression relation commercant-fournisseur : " . ($deleted_rel ? "OK" : "ECHEC"));
+            error_log(" Suppression relation commercant-fournisseur : " . ($deleted_rel ? "OK" : "ECHEC"));
 
             // 4. Vérifier relations restantes
             $relations = $wpdb->get_var(
@@ -391,7 +391,7 @@ class Database {
                     $fournisseur_id
                 )
             );
-            //error_log(" Nombre de relations restantes pour ce fournisseur : $relations");
+            error_log(" Nombre de relations restantes pour ce fournisseur : $relations");
 
             if (!$relations) {
                 // Récupérer nom avant suppression
@@ -429,12 +429,12 @@ class Database {
         } else {
             // Mode non-marketplace
             $deleted_fourn = $wpdb->delete(FAND_FOURNISSEURS_TABLE, ['id' => $fournisseur_id]);
-            //error_log(" Fournisseur supprimé (non-marketplace) : " . ($deleted_fourn ? "OK" : "ECHEC"));
+            error_log(" Fournisseur supprimé (non-marketplace) : " . ($deleted_fourn ? "OK" : "ECHEC"));
 
             $term = get_term($fournisseur_id, FAND_FOURNISSEURS_ATTRIBUT);
             if ($term && !is_wp_error($term)) {
                 wp_delete_term($fournisseur_id, FAND_FOURNISSEURS_ATTRIBUT);
-                //error_log(" Term global supprimé (non-marketplace) : $fournisseur_id");
+                error_log(" Term global supprimé (non-marketplace) : $fournisseur_id");
             }
         }
 

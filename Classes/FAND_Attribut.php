@@ -1,6 +1,7 @@
 <?php
 
 namespace fand\Classes;
+use fandmarket\Classes\marketutils;
 
 class FAND_Attribut {
 
@@ -49,7 +50,7 @@ class FAND_Attribut {
         $args = ['description' => $term];
 
         if (!$term_check) {
-            $insert_result = wp_insert_term($term, sanitize_title($taxonomy), $args);
+            $insert_result = wp_insert_term($term, $taxonomy, $args);
 
             if (is_wp_error($insert_result)) {
                 //error_log('Erreur wp_insert_term : ' . $insert_result->get_error_message());
@@ -66,21 +67,7 @@ class FAND_Attribut {
 
         // Si WCFM est actif, on ajoute la relation commerçant <-> terme
         if (FAND_MARKET_ACTIVE && $commercant_id !== null) {
-            $table_relation = FAND_COMMERCANTS_TERMS;
-            //error_log('table_relation :' . $table_relation);
-
-            $exists = $wpdb->get_var($wpdb->prepare(
-                "SELECT id FROM $table_relation WHERE commercant_id = %d AND term_id = %d",
-                $commercant_id,
-                $term_id
-            ));
-
-            if (!$exists) {
-                $wpdb->insert($table_relation, [
-                    'commercant_id' => $commercant_id,
-                    'term_id'       => $term_id,
-                ]);
-            }
+            marketutils::lier_commercant_au_terme($commercant_id, $term_id);
         }
 
         return $term_id;
@@ -129,26 +116,26 @@ class FAND_Attribut {
     static function delete_term_attribut($slug, $term) {
         $taxonomy = sanitize_title($slug);
 
-        //error_log("🔎 Suppression terme dans taxonomie '$taxonomy' pour valeur : " . print_r($term, true));
+        //error_log("Suppression terme dans taxonomie '$taxonomy' pour valeur : " . print_r($term, true));
 
         // Vérifier si le terme existe
         $term_id = term_exists($term, $taxonomy);
 
         if (!$term_id) {
-            //error_log("❌ Aucun terme trouvé pour '$term' dans taxonomie '$taxonomy'");
+            //error_log("Aucun terme trouvé pour '$term' dans taxonomie '$taxonomy'");
             return false;
         }
 
-        //error_log("✅ Terme trouvé : ID=" . $term_id['term_id'] . " (taxonomy=$taxonomy)");
+        //error_log("Terme trouvé : ID=" . $term_id['term_id'] . " (taxonomy=$taxonomy)");
 
         // Supprimer le terme de la taxonomie spécifiée
         $result = wp_delete_term($term_id['term_id'], $taxonomy);
 
         if (is_wp_error($result)) {
-            //error_log("⚠️ Erreur suppression terme ID=" . $term_id['term_id'] . " : " . $result->get_error_message());
+            //error_log("Erreur suppression terme ID=" . $term_id['term_id'] . " : " . $result->get_error_message());
             return $result; // Retourner l'erreur si la suppression échoue
         } else {
-            //error_log("🗑️ Terme ID=" . $term_id['term_id'] . " supprimé avec succès.");
+            //error_log("Terme ID=" . $term_id['term_id'] . " supprimé avec succès.");
             return true; // Retourner vrai si la suppression a réussi
         }
     }

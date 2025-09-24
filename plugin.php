@@ -4,6 +4,8 @@ namespace fand;
 
 use fand\Classes\FAND_Attribut;
 use fand\Classes\Database\Database;
+use fandmarket\FANDSettingsPageMarket;
+
 
 class FANDSettingsPage {
 
@@ -215,7 +217,7 @@ class FANDSettingsPage {
 		}
 	}
 
-	function envoyer_email_fournisseur_apres_paiement($order_id) {
+	/*function envoyer_email_fournisseur_apres_paiement($order_id) {
 
 		global $wpdb;
 		if (is_plugin_active(FAND_PRO_PLUGIN)) {
@@ -256,6 +258,9 @@ class FANDSettingsPage {
 		// Récupérer le logo de la boutique
 		$shop_logo_url = get_site_icon_url();
 
+		// Récupérer l'email de la boutique
+		$shop_email = get_option('woocommerce_email_from_address');
+
 		// Tableau pour stocker les produits par fournisseur et leurs emails respectifs
 		$produits_par_fournisseur = array();
 
@@ -268,7 +273,9 @@ class FANDSettingsPage {
 				continue;
 			}
 			
+			if (FAND_MARKET_ACTIVE) {
 			$info = self::fand_get_vendor_and_supplier_info($product_id);
+			}
 		
 			// Récupérer le code GTIN/EAN
 			$gtin = get_post_meta($productcap, '_global_unique_id', true);
@@ -316,11 +323,7 @@ class FANDSettingsPage {
 			return;
 		}
 
-		// Récupérer le nom de la boutique
-		$shop_name = get_bloginfo('name');
 
-		// Récupérer l'email de la boutique
-		$shop_email = get_option('woocommerce_email_from_address');
 
 		// Envoi des emails aux fournisseurs concernés
 		foreach ($produits_par_fournisseur as $fournisseur_email => $data) {
@@ -336,162 +339,188 @@ class FANDSettingsPage {
 			$mail_sent = wp_mail($fournisseur_email, $email_subject, $email_body, $headers);
 
 		}
-	}
-
-
-	/**
-	 * Récupère vendeur (WCFM) + fournisseur (tables custom) pour un produit donné
-	 *
-	 * @param int $product_id
-	 * @return array|null
-	 */
-	function fand_get_vendor_and_supplier_info($product_id) {
+	}*/
+	function envoyer_email_fournisseur_apres_paiement($order_id) {
 		global $wpdb;
 
-		// Tables (fallback si constantes non définies)
-		$tbl_fournisseurs = defined('FAND_FOURNISSEURS_TABLE') ? FAND_FOURNISSEURS_TABLE : $wpdb->prefix . 'fand_fournisseurs';
-		$tbl_relations    = defined('FAND_COMMERCANTS_FOURNISSEURS_TABLE') ? FAND_COMMERCANTS_FOURNISSEURS_TABLE : $wpdb->prefix . 'fand_commercants_fournisseurs';
-
-		// === 1) Vendeur WCFM (avec fallback Woo principal) ===
-		$vendor_id = get_post_field('post_author', $product_id);
-		if (!$vendor_id) {
-			error_log("❌ [fand_get_vendor_and_supplier_info] Aucun vendor pour produit $product_id");
-			return null;
+		// Options addon
+		if (is_plugin_active(FAND_PRO_PLUGIN)) {
+			$show_price_column = get_option('split_email_add_price');
+			$send_shop_address = get_option('split_email_send_shop_address');
+		} else {
+			$show_price_column = 0;
+			$send_shop_address = 0;
 		}
 
-		$vendor_shop_name = get_user_meta($vendor_id, 'wcfmmp_store_name', true);
-		$vendor_user      = get_userdata($vendor_id);
-		$profile_settings = get_user_meta($vendor_id, '_wcfmmp_profile_settings', true);
-		$vendor_logo_meta = (is_array($profile_settings) && !empty($profile_settings['gravatar'])) ? $profile_settings['gravatar'] : null;
+		// Récupération commande
+		$order = wc_get_order($order_id);
+		if (!$order) {
+			error_log("[SplitEmail] Commande introuvable pour ID $order_id");
+			return;
+		}
 
-		$vendor_shop_email   = $vendor_user ? $vendor_user->user_email : '';
-		$vendor_shop_logo    = $vendor_logo_meta ?: get_site_icon_url();
-		$vendor_shop_address = get_user_meta($vendor_id, '_wcfmmp_store_address', true);
+		// Email admin
+		$admin_email = get_option('admin_email');
+		if (!$admin_email) {
+			error_log("[SplitEmail] Aucun email admin configuré");
+			return;
+		}
 
-		// Fallback si "Boutique sans nom" ou nom vide
-		if (empty($vendor_shop_name) || $vendor_shop_name === 'Boutique sans nom') {
-			$vendor_shop_name  = get_bloginfo('name');
-			$vendor_shop_email = get_option('admin_email');
-			$vendor_shop_logo  = get_site_icon_url();
+		// Pays de livraison
+		$shipping_country = WC()->countries->countries[$order->get_shipping_country()] ?? '';
+		$shipping_address = $order->get_formatted_shipping_address() . ', ' . $shipping_country;
 
-			$default_country   = get_option('woocommerce_default_country');
-			$country_code      = $default_country && strpos($default_country, ':') !== false ? explode(':', $default_country)[0] : $default_country;
-			$country_name      = (function_exists('WC') && isset(WC()->countries->countries[$country_code])) ? WC()->countries->countries[$country_code] : $country_code;
+		// Nom site + logo global Woo
+		$shop_name     = get_bloginfo('name');
+		$shop_logo_url = get_site_icon_url();
+		$shop_email    = get_option('woocommerce_email_from_address');
 
-			$vendor_shop_address = trim(sprintf(
-				'%s, %s %s, %s',
-				(string) get_option('woocommerce_store_address'),
-				(string) get_option('woocommerce_store_postcode'),
-				(string) get_option('woocommerce_store_city'),
-				(string) $country_name
-			));
+		// Tableau regroupement
+		$groupes = [];
 
-			error_log("➡️ [Vendor] Fallback Woo principal : Nom={$vendor_shop_name}, Email={$vendor_shop_email}");
-		} else {
-			// Si adresse WCFM est un array, formater
-			if (is_array($vendor_shop_address)) {
-				$parts = array_filter([
-					$vendor_shop_address['street_1'] ?? '',
-					$vendor_shop_address['street_2'] ?? '',
-					($vendor_shop_address['postcode'] ?? '') . ' ' . ($vendor_shop_address['city'] ?? ''),
-					$vendor_shop_address['country'] ?? ''
-				]);
-				$vendor_shop_address = trim(implode(', ', array_map('trim', $parts)), ', ');
+		foreach ($order->get_items() as $item_id => $item) {
+			$product_id   = $item->get_product_id();
+			$productcap   = $item->get_variation_id() ? $item->get_variation_id() : $product_id;
+			$product      = wc_get_product($product_id);
+
+			if (!$product) {
+				error_log("[SplitEmail] Produit $product_id introuvable");
+				continue;
 			}
-			error_log("✅ [Vendor] ID={$vendor_id}, Nom={$vendor_shop_name}, Email={$vendor_shop_email}");
+
+			// GTIN
+			$gtin  = get_post_meta($productcap, '_global_unique_id', true);
+			$price = $product->get_price();
+
+			// Mode marketplace activé
+			if (defined('FAND_MARKET_ACTIVE') && FAND_MARKET_ACTIVE) {
+				$info = FANDSettingsPageMarket::fand_get_vendor_and_supplier_info($product_id);
+
+				if (!$info || empty($info['fournisseur'])) {
+					error_log("[SplitEmail] Pas de fournisseur pour produit $product_id");
+					continue;
+				}
+
+				$vendor      = $info['vendeur'];
+				$fournisseur = $info['fournisseur'];
+
+				$key = $vendor['id'] . '-' . $fournisseur['id'];
+				if (!isset($groupes[$key])) {
+					$groupes[$key] = [
+						'vendeur'     => $vendor,
+						'fournisseur' => $fournisseur,
+						'produits'    => []
+					];
+				}
+
+				$groupes[$key]['produits'][] = [
+					'nom'      => $item->get_name(),
+					'quantite' => $item->get_quantity(),
+					'gtin'     => $gtin,
+					'price'    => $price
+				];
+
+				error_log("[SplitEmail] Ajout produit {$item->get_name()} ({$item->get_quantity()}) au couple Vendor={$vendor['nom']} / Fournisseur={$fournisseur['nom']}");
+
+			} else {
+				// === Mode FREE (sans marketplace) ===
+				$terms = get_the_terms($product_id, FAND_FOURNISSEURS_ATTRIBUT);
+				if ($terms && !is_wp_error($terms)) {
+					$fournisseur_term = $terms[0];
+					$fournisseur_nom  = $fournisseur_term->name;
+
+					$fournisseur_email_row = $wpdb->get_row($wpdb->prepare(
+						"SELECT email FROM " . FAND_FOURNISSEURS_TABLE . " WHERE nom = %s",
+						$fournisseur_nom
+					));
+
+					if (!$fournisseur_email_row || empty($fournisseur_email_row->email)) {
+						error_log("[SplitEmail] Pas d'email fournisseur trouvé pour $fournisseur_nom");
+						continue;
+					}
+
+					$fournisseur_email = $fournisseur_email_row->email;
+
+					if (!isset($groupes[$fournisseur_email])) {
+						$groupes[$fournisseur_email] = [
+							'fournisseur' => [
+								'nom'   => $fournisseur_nom,
+								'email' => $fournisseur_email,
+							],
+							'produits' => []
+						];
+					}
+
+					$groupes[$fournisseur_email]['produits'][] = [
+						'nom'      => $item->get_name(),
+						'quantite' => $item->get_quantity(),
+						'gtin'     => $gtin,
+						'price'    => $price
+					];
+
+					//error_log("[SplitEmail FREE] Ajout produit {$item->get_name()} ({$item->get_quantity()}) pour fournisseur={$fournisseur_nom}");
+				}
+			}
 		}
 
-		// === 2) Terme fournisseur du PRODUIT ===
-		$terms = get_the_terms($product_id, FAND_FOURNISSEURS_ATTRIBUT);
-		if (!$terms || is_wp_error($terms)) {
-			error_log("❌ [Supplier] Aucun terme fournisseur pour produit $product_id");
-			$result = [
-				'vendeur' => [
-					'id'      => $vendor_id,
-					'nom'     => $vendor_shop_name,
-					'email'   => $vendor_shop_email,
-					'logo'    => $vendor_shop_logo,
-					'adresse' => $vendor_shop_address,
-				],
-				'fournisseur' => null
+		if (empty($groupes)) {
+			error_log("[SplitEmail] Aucun groupe (vendeur/fournisseur) à traiter pour commande $order_id");
+			return;
+		}
+
+		// Envoi des mails
+		foreach ($groupes as $key => $data) {
+
+			if (isset($data['vendeur'])) {
+				// === Mode PRO ===
+				$vendeur     = $data['vendeur'];
+				$fournisseur = $data['fournisseur'];
+				$produits    = $data['produits'];
+				$shop_logo_url = $vendeur['logo'];
+				$shop_address     = $vendeur['adresse'];  // Adresse du vendeur
+				$nom_fournisseur  = $fournisseur['nom'];  // Nom du fournisseur
+
+				$fournisseur_email = $fournisseur['email'];
+				$email_subject     = "Nouvelle commande - {$vendeur['nom']} → {$fournisseur['nom']}";
+
+			} else {
+				// === Mode FREE ===
+				$fournisseur = $data['fournisseur'];
+				$produits    = $data['produits'];
+				$shop_logo_url = get_site_icon_url();
+				$shop_address = get_option('woocommerce_store_address') . ', ' 
+							. get_option('woocommerce_store_city') . ', '
+							. get_option('woocommerce_store_postcode') . ', ' 
+							. (WC()->countries->countries[get_option('woocommerce_default_country')] ?? '');
+				$nom_fournisseur  = $fournisseur['nom'];
+
+				$fournisseur_email = $fournisseur['email'];
+				$email_subject     = "Nouvelle commande pour vos produits";
+			}
+
+			//error_log('DEBUG EMAIL: shop_logo_url=' . $shop_logo_url);
+			//error_log('DEBUG EMAIL: shop_name=' . $shop_name);
+			//error_log('DEBUG EMAIL: shop_address=' . $shop_address);
+			//error_log('DEBUG EMAIL: nom_fournisseur=' . $nom_fournisseur);
+			//error_log('DEBUG EMAIL: show_price_column=' . $show_price_column);
+			//error_log('DEBUG EMAIL: send_shop_address=' . $send_shop_address);
+			//error_log('DEBUG EMAIL: shipping_address=' . $shipping_address);
+			//error_log('DEBUG EMAIL: produits=' . print_r($produits, true));
+			
+			// Ensuite tu inclus ton template
+			$email_body = include FAND_PLUGIN_DIR . 'Templates/email-fournisseur.php';
+
+			$headers = [
+				'Content-Type: text/html; charset=UTF-8',
+				'From: ' . ($vendeur['nom'] ?? get_bloginfo('name')) . ' <' . ($vendeur['email'] ?? get_option('admin_email')) . '>',
+				'Cc: ' . get_option('admin_email')
 			];
-			error_log("📦 Résultat final pour produit $product_id : " . print_r($result, true));
-			return $result;
+
+
+			$sent = wp_mail($fournisseur_email, $email_subject, $email_body, $headers);
+
+			error_log("Envoi à {$nom_fournisseur} ({$fournisseur_email}) : " . ($sent ? 'OK' : 'ECHEC'));
 		}
-
-		$term = reset($terms);
-		$term_id   = (int) $term->term_id;
-		$term_name = $term->name;
-		error_log("➡️ [Supplier] Terme trouvé : ID={$term_id}, Nom={$term_name}");
-
-		// === 3) Fournisseur global par NOM ===
-		$fournisseur = $wpdb->get_row(
-			$wpdb->prepare("SELECT * FROM {$tbl_fournisseurs} WHERE nom = %s", $term_name)
-		);
-
-		if (!$fournisseur) {
-			error_log("❌ [Supplier] Aucun fournisseur global nommé '{$term_name}'");
-			$result = [
-				'vendeur' => [
-					'id'      => $vendor_id,
-					'nom'     => $vendor_shop_name,
-					'email'   => $vendor_shop_email,
-					'logo'    => $vendor_shop_logo,
-					'adresse' => $vendor_shop_address,
-				],
-				'fournisseur' => null
-			];
-			error_log("📦 Résultat final pour produit $product_id : " . print_r($result, true));
-			return $result;
-		}
-
-		error_log("✅ [Supplier] Global trouvé : ID={$fournisseur->id}, Nom={$fournisseur->nom}, Email={$fournisseur->email}");
-
-		// === 4) Relation spécifique vendor ↔ fournisseur (override adresse/tel/note) ===
-		$relation = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT id, adresse, cp, ville, pays, telephone, note_personnelle
-				FROM {$tbl_relations}
-				WHERE commercant_id = %d AND fournisseur_id = %d
-				LIMIT 1",
-				$vendor_id,
-				$fournisseur->id
-			)
-		);
-
-		if ($relation) {
-			error_log("✅ [Relation] trouvée pour vendor {$vendor_id} ↔ fournisseur {$fournisseur->id} : " . print_r($relation, true));
-		} else {
-			error_log("ℹ️ [Relation] Aucune relation spécifique vendor {$vendor_id} ↔ fournisseur {$fournisseur->id}");
-		}
-
-		// Préparer les champs qui viennent soit de la relation (si présente) soit du fournisseur global
-		$fournisseur_data = [
-			'id'        => (int) $fournisseur->id,
-			'nom'       => (string) $fournisseur->nom,
-			'email'     => (string) $fournisseur->email,
-			'adresse'   => $relation && !empty($relation->adresse)   ? $relation->adresse   : (string) $fournisseur->adresse,
-			'cp'        => $relation && !empty($relation->cp)        ? $relation->cp        : (string) $fournisseur->cp,
-			'ville'     => $relation && !empty($relation->ville)     ? $relation->ville     : (string) $fournisseur->ville,
-			'pays'      => $relation && !empty($relation->pays)      ? $relation->pays      : (string) $fournisseur->pays,
-			'telephone' => $relation && !empty($relation->telephone) ? $relation->telephone : (string) $fournisseur->telephone,
-			'note'      => $relation->note_personnelle ?? null,
-		];
-
-		// Log complet juste avant le return
-		$final = [
-			'vendeur' => [
-				'id'      => $vendor_id,
-				'nom'     => $vendor_shop_name,
-				'email'   => $vendor_shop_email,
-				'logo'    => $vendor_shop_logo,
-				'adresse' => $vendor_shop_address,
-			],
-			'fournisseur' => $fournisseur_data
-		];
-		error_log("📦 Résultat final pour produit {$product_id} : " . print_r($final, true));
-
-		return $final;
 	}
 
 }

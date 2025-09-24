@@ -2,11 +2,9 @@
 // Construction du corps de l'email avec un bandeau, logo, et informations de la boutique
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-			$email_body = '
-
-			<html>
-
-			<body>
+	$email_body = '
+	<html>
+		<body>
 
 			<div style="background-color:#f0f0f0; padding:20px; text-align:center;">
 
@@ -15,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 			</div>
 
 			<div style="padding:20px; display: flex; justify-content: space-between; align-items: flex-start;">
-
 			<div>
 
 				<p><strong>Coordonnées de la boutique :</strong></p>
@@ -98,6 +95,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 			</div>
 
-			</body>
+		</body>
 
-			</html>';
+	</html>';
+
+	return $email_body;

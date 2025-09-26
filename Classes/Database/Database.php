@@ -3,6 +3,7 @@
 namespace fand\Classes\Database;
 
 use fand\Classes\FAND_Attribut;
+use fandmarket\Classes\marketutils;
 
 class Database {
 
@@ -192,6 +193,28 @@ class Database {
                 ['id' => $fournisseur_id]
             );
 
+            $commercant_id = get_current_user_id();
+
+            $infos = [
+                'adresse'   => $adresse,
+                'cp'        => $cp,
+                'ville'     => $ville,
+                'pays'      => $pays,
+                'telephone' => $telephone,
+            ];
+
+            marketutils::enregistrer_relation_commercant_fournisseur($fournisseur_id, $commercant_id, $infos);
+
+            // maj infos globales
+/*            $result = $wpdb->update(
+                FAND_FOURNISSEURS_TABLE,
+                [
+                    'nom'   => $nom,
+                    'email' => $email,
+                ],
+                ['id' => $fournisseur_id]
+            );
+
             // maj relation vendeur/fournisseur
             $commercant_id = get_current_user_id();
 
@@ -235,9 +258,10 @@ class Database {
                         'telephone'      => $telephone,
                     ]
                 );
-            }
+            }*/
 
-        } else {
+        } 
+        else {
             // Mode simple → mise à jour directe
             $result = $wpdb->update(
                 FAND_FOURNISSEURS_TABLE,

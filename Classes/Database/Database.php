@@ -4,6 +4,7 @@ namespace fand\Classes\Database;
 
 use fand\Classes\FAND_Attribut;
 use fandmarket\Classes\marketutils;
+use const FAND_COMMERCANTS_FOURNISSEURS_TABLE;
 
 class Database {
 
@@ -206,7 +207,7 @@ class Database {
             marketutils::enregistrer_relation_commercant_fournisseur($fournisseur_id, $commercant_id, $infos);
 
             // maj infos globales
-/*            $result = $wpdb->update(
+            /*$result = $wpdb->update(
                 FAND_FOURNISSEURS_TABLE,
                 [
                     'nom'   => $nom,

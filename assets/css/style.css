@@ -1,7 +1,6 @@
 body {
     display: flex;
-    justify-content: center; /* Centre horizontalement */
-    align-items: center; /* Centre verticalement */
+    flex-direction: column;
     min-height: 90vh; /* Prend toute la hauteur de la fenêtre */
     margin: 0; /* Supprime les marges par défaut */
     background-color: #f8f9fa; /* Optionnel : couleur de fond */
@@ -16,17 +15,14 @@ body {
 }
 
 .div_conteneur_parent {
-    display: flex;
-    justify-content: center; /* Centre le contenu horizontalement */
-    width: 100%; /* S'assure que le conteneur prend toute la largeur */
+    display: block;
+    /*justify-content: center; /* Centre le contenu horizontalement */
 }
 
 .div_conteneur_page {
-    min-height: 90vh; /* 90% de la hauteur de l'écran */
-    width: 100%; /* S'assure que le conteneur prend toute la largeur */
-    max-width: 90%; /* Limite la largeur à 800px */
-    padding: 20px; /* Ajoute un peu de rembourrage */
-    background-color: white; /* Couleur de fond du conteneur */
+    min-height: 90vh; 
+    padding: 20px; 
+    background-color: white; 
     border-radius: 8px; /* Coins arrondis */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre douce */
     margin: 0; /* Centre le conteneur sur la page */

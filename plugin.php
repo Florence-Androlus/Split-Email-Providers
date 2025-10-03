@@ -15,7 +15,7 @@ class FANDSettingsPage {
 		//Enregistrement du hook pour enqueuer les scripts seulement dans l'administration
 		add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
 		// Register the settings page.
-		add_action( 'admin_menu', [$this,'register_fournisseurs_menu' ] );
+		add_action( 'admin_menu', [$this,'register_fournisseurs_menu' ], 5 );
 
 		// Ajouter l'action pour envoyer un email après le paiement complet de la commande
 		add_action('woocommerce_payment_complete', [$this,'envoyer_email_fournisseur_apres_paiement']);
@@ -342,15 +342,13 @@ class FANDSettingsPage {
 	}*/
 	function envoyer_email_fournisseur_apres_paiement($order_id) {
 		global $wpdb;
-
+		$show_price_column = 0;
+		$send_shop_address = 0;
 		// Options addon
 		if (is_plugin_active(FAND_PRO_PLUGIN)) {
 			$show_price_column = get_option('split_email_add_price');
 			$send_shop_address = get_option('split_email_send_shop_address');
-		} else {
-			$show_price_column = 0;
-			$send_shop_address = 0;
-		}
+		} 
 
 		// Récupération commande
 		$order = wc_get_order($order_id);

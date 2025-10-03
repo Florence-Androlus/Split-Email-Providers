@@ -4,7 +4,7 @@ Tags: WooCommerce, supplier, email, supplier management
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 Requires Plugins: woocommerce
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,7 +35,7 @@ Main features:
 
 Automatic email sending to suppliers: With every order, emails are sent to the relevant suppliers with the details of their products.
 
-Seamless integration: Works directly with WooCommerce without complicated configuration.
+Seamless Integration: Works directly with WooCommerce without requiring complex configuration.
 
 Split orders by supplier based on the products in each order.
 
@@ -53,7 +53,14 @@ Redirect orders to your store (ideal for assembling or checking before customer 
 
 Low stock email alerts: Automatically send an email to a supplier when a product stock drops below a minimum threshold.
 
-🔗 Access the premium version here: Split Email Providers
+🔗 Access the premium version here: [Split Email Providers](https://split-email-providers.com/)
+
+For multi-vendor marketplaces, discover **Split Market**:
+
+- Advanced supplier management for each WCFM seller
+- Automatic emails sent to suppliers per seller, with a copy to the seller
+
+🔗 Discover the premium version here: [Split Market] (https://split-email-providers.com/)
 
 == Installation ==
 
@@ -75,6 +82,9 @@ Yes — Split Email Providers is designed specifically for WooCommerce stores.
 
 = Does the addon send emails automatically? =
 Yes — as soon as an order is placed and validated, the addon detects the supplier’s products and sends the emails automatically.
+
+= Is the seller notified when their suppliers receive an email? =
+Yes, the seller is systematically copied on emails sent to their suppliers.
 
 = Can the content of the supplier emails be customized? =
 No — advanced email customization is coming very soon in the Pro version.
@@ -100,6 +110,9 @@ Custom settings – ⚙️ Customization options to adapt the addon to your stor
 Supplier email – 📨 Example of an automatic email sent to a supplier with the products involved in an order.
 
 == Changelog ==
+
+= 1.1.3 =
+Added split email provider market compatibility for WCFM
 
 = 1.1.2 =
 Requires Plugins: woocommerce

@@ -6,11 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'fandpro\\Classes\\' => array($baseDir . '/../split-email-providers-pro/Classes'),
-    'fandpro\\' => array($baseDir . '/../split-email-providers-pro'),
-    'fand\\Classes\\' => array($baseDir . '/Classes'),
+    'fand\\Classes\\' => array($baseDir . '/src/Classes'),
     'fand\\' => array($baseDir . '/'),
-    'Symfony\\Component\\Finder\\' => array($vendorDir . '/symfony/finder'),
-    'Mustangostang\\' => array($vendorDir . '/wp-cli/mustangostang-spyc/src'),
-    'Automattic\\WooCommerce\\' => array($vendorDir . '/automattic/woocommerce/src/WooCommerce'),
 );

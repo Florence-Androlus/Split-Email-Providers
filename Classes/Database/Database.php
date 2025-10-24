@@ -42,6 +42,7 @@ class Database {
         $alert = [];
         $message = '';
         $message_type = '';
+        
 
         // Récupérer les données du formulaire
         $data = [
@@ -56,9 +57,6 @@ class Database {
         ];
         extract($data);
 
-        $table_name = FAND_COMMERCANTS_FOURNISSEURS_TABLE;
-        $commercant_id = get_current_user_id();
-
         // Vérifier si le fournisseur existe déjà
         $existing_supplier = $wpdb->get_row(
             $wpdb->prepare(
@@ -69,39 +67,14 @@ class Database {
         );
 
         if ($existing_supplier) {
-            // Fournisseur existe, on utilise son ID
-            $fournisseur_id = $existing_supplier->id;
 
-            // Vérifie si la relation existe déjà
-            $relation = $wpdb->get_row(
-                $wpdb->prepare(
-                    "SELECT * FROM $table_name WHERE commercant_id = %d AND fournisseur_id = %d",
-                    $commercant_id,
-                    $fournisseur_id
-                )
-            );
+                // Fournisseur existe, on utilise son ID
+                $fournisseur_id = $existing_supplier->id;
 
-            if (!$relation) {
-                // Création de la relation sans modifier le fournisseur
-                $wpdb->insert(
-                    $table_name,
-                    [
-                        'commercant_id'  => $commercant_id,
-                        'fournisseur_id' => $fournisseur_id,
-                        'adresse'        => $adresse,
-                        'cp'             => $cp,
-                        'ville'          => $ville,
-                        'telephone'      => $telephone,
-                        'pays'           => $pays,
-                    ]
-                );
+            if (FAND_MARKET_ACTIVE) {
+                marketutils::add_relation_commercant_fournisseur($fournisseur_id, $commercant_id, $data);
 
-                // 💡 Ajouter le terme pour cet attribut
-                if (FAND_MARKET_ACTIVE) {
-                    $term_result = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $commercant_id);
-                } else {
-                    $term_result = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom);
-                }
+                $term_result = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $commercant_id);
 
                 if (is_wp_error($term_result)) {
                     $message = "Fournisseur associé, mais erreur lors de l'association attribut.";
@@ -110,8 +83,9 @@ class Database {
                     $message = 'Fournisseur associé à votre compte.';
                     $message_type = 'success';
                 }
-
-            } else {
+            
+            }
+            else {
                 $message = 'Ce fournisseur est déjà associé à votre compte.';
                 $message_type = 'error';
             }
@@ -130,19 +104,10 @@ class Database {
 
             $fournisseur_id = $wpdb->insert_id;
 
-            // Créer la relation commerçant <-> fournisseur
-            $wpdb->insert($table_name, [
-                'commercant_id'  => $commercant_id,
-                'fournisseur_id' => $fournisseur_id,
-                'adresse'        => $adresse,
-                'cp'             => $cp,
-                'ville'          => $ville,
-                'telephone'      => $telephone,
-                'pays'           => $pays,
-            ]);
-
-            // Ajouter le terme
             if (FAND_MARKET_ACTIVE) {
+                marketutils::add_relation_commercant_fournisseur($fournisseur_id, $commercant_id, $data);
+
+                // Ajouter le terme
                 $term_result = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $commercant_id);
             } else {
                 $term_result = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom);
@@ -308,10 +273,9 @@ class Database {
     static function get_all_fournisseurs() {
         global $wpdb;
 
-        $table_relations    = FAND_COMMERCANTS_FOURNISSEURS_TABLE;
         $table_fournisseurs = FAND_FOURNISSEURS_TABLE;
 
-        // Vérif marketplace
+        // Marketplace inactive
         if (!defined('FAND_MARKET_ACTIVE') || !FAND_MARKET_ACTIVE) {
             $results = $wpdb->get_results("SELECT * FROM $table_fournisseurs");
             return $results;
@@ -320,7 +284,7 @@ class Database {
         // Marketplace active
         $user_id = get_current_user_id();
         $user    = get_userdata($user_id);
-
+        $table_relations    = FAND_COMMERCANTS_FOURNISSEURS_TABLE;
         // User est vendeur → récupérer uniquement SES fournisseurs
         $query = $wpdb->prepare("
             SELECT f.*, 
@@ -370,13 +334,13 @@ class Database {
 
         if (FAND_MARKET_ACTIVE) {
             $commercant_id = get_current_user_id();
-            error_log("ℹ Commerçant courant : $commercant_id");
+            //error_log("ℹ Commerçant courant : $commercant_id");
             // Récupérer nom avant suppression
             $fournisseur_data = $wpdb->get_row(
                 $wpdb->prepare("SELECT id, nom FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id=%d", $fournisseur_id),
                 ARRAY_A
             );
-            error_log("ℹ Données fournisseur avant suppression : " . print_r($fournisseur_data, true));
+            //error_log("ℹ Données fournisseur avant suppression : " . print_r($fournisseur_data, true));
             $fournisseur_nom = $fournisseur_data['nom'];
 
             // Récupérer le terme global du fournisseur
@@ -384,7 +348,7 @@ class Database {
 
             if ($term) {
                 $term_id = intval($term->term_id);
-                error_log("ℹ Term_id à supprimer pour ce commerçant : $term_id");
+                //error_log("ℹ Term_id à supprimer pour ce commerçant : $term_id");
 
                 // Supprimer la relation uniquement pour ce commerçant
                 $deleted_term_rel = $wpdb->delete(
@@ -394,9 +358,9 @@ class Database {
                         'term_id'       => $term_id
                     ]
                 );
-                error_log(" Suppression relation commercant=$commercant_id ↔ term_id=$term_id : " . ($deleted_term_rel ? "OK" : "ECHEC"));
+                //error_log(" Suppression relation commercant=$commercant_id ↔ term_id=$term_id : " . ($deleted_term_rel ? "OK" : "ECHEC"));
             } else {
-                error_log("Aucun terme trouvé pour '$fournisseur_nom'");
+                //error_log("Aucun terme trouvé pour '$fournisseur_nom'");
             }
 
             // 2. Supprimer relation commercant ↔ fournisseur
@@ -407,7 +371,7 @@ class Database {
                     'fournisseur_id' => $fournisseur_id
                 ]
             );
-            error_log(" Suppression relation commercant-fournisseur : " . ($deleted_rel ? "OK" : "ECHEC"));
+            //error_log(" Suppression relation commercant-fournisseur : " . ($deleted_rel ? "OK" : "ECHEC"));
 
             // 4. Vérifier relations restantes
             $relations = $wpdb->get_var(
@@ -416,7 +380,7 @@ class Database {
                     $fournisseur_id
                 )
             );
-            error_log(" Nombre de relations restantes pour ce fournisseur : $relations");
+            //error_log(" Nombre de relations restantes pour ce fournisseur : $relations");
 
             if (!$relations) {
                 // Récupérer nom avant suppression
@@ -446,27 +410,56 @@ class Database {
                         $result_delete_term = wp_delete_term($term->term_id, FAND_FOURNISSEURS_ATTRIBUT);
                         //error_log(" Suppression terme global : " . ($result_delete_term && !is_wp_error($result_delete_term) ? "OK" : "ECHEC"));
                     } else {
-                        error_log(" Aucun terme global trouvé pour '$fournisseur_nom'");
+                        //error_log(" Aucun terme global trouvé pour '$fournisseur_nom'");
                     }
                 }
             }
 
+            $alert = [
+                'message' => 'Fournisseur supprimé avec succès.',
+                'message_type' => 'success'
+            ];
+            return $alert;
+
         } else {
-            // Mode non-marketplace
-            $deleted_fourn = $wpdb->delete(FAND_FOURNISSEURS_TABLE, ['id' => $fournisseur_id]);
-            error_log(" Fournisseur supprimé (non-marketplace) : " . ($deleted_fourn ? "OK" : "ECHEC"));
+            // Suppression d'un fournisseur
+            $fournisseur_id = intval($POST['fournisseur_id']); // Récupérer l'ID du fournisseur à supprimer
 
-            $term = get_term($fournisseur_id, FAND_FOURNISSEURS_ATTRIBUT);
-            if ($term && !is_wp_error($term)) {
-                wp_delete_term($fournisseur_id, FAND_FOURNISSEURS_ATTRIBUT);
-                error_log(" Term global supprimé (non-marketplace) : $fournisseur_id");
+            // Récupérer le fournisseur pour obtenir le nom du term
+            $fournisseur = $wpdb->get_row($wpdb->prepare("SELECT nom FROM %i WHERE id = %d",FAND_FOURNISSEURS_TABLE, $fournisseur_id));
+
+            if ($fournisseur) {
+                // Supprimer le term associé
+                $term_name = $fournisseur->nom; // Nom du term à supprimer
+
+                // Appeler la fonction pour supprimer le term
+                $result = FAND_Attribut::delete_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $term_name);
+                if (is_wp_error($result)) {
+                    $message = 'Erreur lors de la suppression du term : ' . $result->get_error_message();
+                    $message_type = 'error'; // Indicateur d'erreur
+                } 
+                else {
+                    $message = 'Term supprimé avec succès.';
+                    $message_type = 'success'; // Indicateur de succès
+                }
             }
+
+            // Supprimer le fournisseur de la base de données
+            $deleted = $wpdb->delete(FAND_FOURNISSEURS_TABLE, array('id' => $fournisseur_id));
+
+            if ($deleted) {
+                $message = 'Fournisseur supprimé avec succès.';
+                $message_type = 'success'; // Indicateur de succès
+            } 
+            else {
+                $message = 'Erreur lors de la suppression du fournisseur.';
+                $message_type = 'error'; // Indicateur d'erreur
+            }
+
+            $alert=['message'=>$message,'message_type'=>$message_type];
+            return $alert;
         }
-
-        $message = 'Fournisseur supprimé avec succès.';
-        $message_type = 'success';
-
-        return ['message' => $message, 'message_type' => $message_type];
+ 
     }
 
 }

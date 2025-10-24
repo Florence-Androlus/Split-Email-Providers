@@ -217,133 +217,11 @@ class FANDSettingsPage {
 		}
 	}
 
-	/*function envoyer_email_fournisseur_apres_paiement($order_id) {
-
-		global $wpdb;
-		if (is_plugin_active(FAND_PRO_PLUGIN)) {
-			$show_price_column = get_option('split_email_add_price');
-			$send_shop_address = get_option('split_email_send_shop_address');
-		}
-		else{
-			$show_price_column = 0;
-			$send_shop_address = 0;
-		}
-		// Récupère la commande
-		$order = wc_get_order($order_id);
-
-		if (!$order) {
-			//error_log('Erreur : commande introuvable pour ID : ' . $order_id);
-			return;
-		}
-
-
-		// Adresse email de l'administrateur
-		$admin_email = get_option('admin_email');
-
-		if (!$admin_email) {
-			return;
-		}
-
-		// Récupération de l'adresse de livraison, ajout du pays
-		$shipping_country = WC()->countries->countries[$order->get_shipping_country()]; 
-		$shipping_address = $order->get_formatted_shipping_address() . ', ' . $shipping_country;
-
-		// Récupérer l'adresse complète de la boutique, y compris le pays
-		$shop_country = WC()->countries->countries[get_option('woocommerce_default_country')];
-		$shop_address = get_option('woocommerce_store_address') . ', ' . get_option('woocommerce_store_city') . ', ' . get_option('woocommerce_store_postcode') . ', ' . $shop_country;
-	
-		// Récupérer le nom du site (shop name)
-		$shop_name = get_bloginfo('name');
-
-		// Récupérer le logo de la boutique
-		$shop_logo_url = get_site_icon_url();
-
-		// Récupérer l'email de la boutique
-		$shop_email = get_option('woocommerce_email_from_address');
-
-		// Tableau pour stocker les produits par fournisseur et leurs emails respectifs
-		$produits_par_fournisseur = array();
-
-		foreach ($order->get_items() as $item_id => $item) {
-			$product_id = $item->get_product_id();
-			$productcap = $item->get_variation_id() ? $item->get_variation_id() : $product_id;
-			$product = wc_get_product($product_id);
-
-			if (!$product) {
-				continue;
-			}
-			
-			if (FAND_MARKET_ACTIVE) {
-			$info = self::fand_get_vendor_and_supplier_info($product_id);
-			}
-		
-			// Récupérer le code GTIN/EAN
-			$gtin = get_post_meta($productcap, '_global_unique_id', true);
-			$price = $product->get_price();
-
-			// Récupère les termes liés à l'attribut 'pa_fournisseur'
-			$terms = get_the_terms($product_id, FAND_FOURNISSEURS_ATTRIBUT);
-
-			if ($terms && !is_wp_error($terms)) {
-				$fournisseur_term = $terms[0];
-				$fournisseur_nom = $fournisseur_term->name;
-
-				// Rechercher l'email du fournisseur dans la base de données
-				$fournisseur_email_row = $wpdb->get_row($wpdb->prepare(
-					"SELECT email FROM %i WHERE nom = %s",FAND_FOURNISSEURS_TABLE,
-					$fournisseur_nom
-				));
-
-				if (!$fournisseur_email_row || empty($fournisseur_email_row->email)) {
-					continue;
-				}
-	
-				$fournisseur_email = $fournisseur_email_row->email;
-
-				// Ajouter les produits dans un tableau associant fournisseur et e-mail
-				if (!isset($produits_par_fournisseur[$fournisseur_email])) {
-					$produits_par_fournisseur[$fournisseur_email] = [
-						'nom_fournisseur' => $fournisseur_nom,
-						'produits' => []
-					];
-				}
-
-				$produits_par_fournisseur[$fournisseur_email]['produits'][] = [
-					'nom' => $item->get_name(),
-					'quantite' => $item->get_quantity(),
-					'gtin' => $gtin,
-					'price' => $price
-				];
-			} else {
-				continue;
-			}
-		}
-	
-		if (empty($produits_par_fournisseur)) {
-			return;
-		}
-
-
-
-		// Envoi des emails aux fournisseurs concernés
-		foreach ($produits_par_fournisseur as $fournisseur_email => $data) {
-			$nom_fournisseur = $data['nom_fournisseur'];
-			$produits = $data['produits'];	
-			$email_subject = 'Nouvelle commande pour vos produits';	
-			// Inclure l'email body
-			include FAND_PLUGIN_DIR . '/Templates/email-fournisseur.php';
-			// Headers pour inclure l'admin en CC
-			$headers = ['Content-Type: text/html; charset=UTF-8','From: ' . $shop_name . ' <' . $shop_email . '>','Cc: ' . $admin_email];
-
-			// Envoi de l'email
-			$mail_sent = wp_mail($fournisseur_email, $email_subject, $email_body, $headers);
-
-		}
-	}*/
 	function envoyer_email_fournisseur_apres_paiement($order_id) {
 		global $wpdb;
 		$show_price_column = 0;
 		$send_shop_address = 0;
+		
 		// Options addon
 		if (is_plugin_active(FAND_PRO_PLUGIN)) {
 			$show_price_column = get_option('split_email_add_price');
@@ -472,6 +350,7 @@ class FANDSettingsPage {
 			if (isset($data['vendeur'])) {
 				// === Mode PRO ===
 				$vendeur     = $data['vendeur'];
+				$shop_name     = $vendeur['nom'];
 				$fournisseur = $data['fournisseur'];
 				$produits    = $data['produits'];
 				$shop_logo_url = $vendeur['logo'];

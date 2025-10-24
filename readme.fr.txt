@@ -1,7 +1,7 @@
 === Split Email Providers ===
 Donate link: https://fan-develop.fr  
 Tags: WooCommerce, fournisseur, email, gestion fournisseurs  
-Requires at least: 5.0  
+Requires at least: 6.8  
 Tested up to: 6.8  
 Requires PHP: 8.2  
 Stable tag: 1.1.3 

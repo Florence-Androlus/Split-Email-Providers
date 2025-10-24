@@ -1,5 +1,5 @@
 {
-    "name": "androlus/fand-split-email-fournisseurs",
+    "name": "androlus/split-email-fournisseurs",
     "authors": [
         {
             "name": "androlus",
@@ -12,11 +12,6 @@
             "fand\\": ".",
             "fand\\Classes\\": "src/Classes/"
         }
-    },
-
-    "require": {
-        "automattic/woocommerce": "^3.1",
-        "pear/http_request2": "^2.6",
-        "wp-cli/wp-cli": "^2.11"
     }
+
 }

@@ -1,18 +1,18 @@
 <?php
 
 namespace fand\Classes;
-use fandmarket\Classes\marketutils;
 
 class FAND_Attribut {
 
-    static public function add_nouvel_attribut($nom_attribut,$attribut_slug)
+    // Fonction pour ajouter un nouvel attribut de produit
+    static public function add_new_taxo()
     {
-        if (!taxonomy_exists($attribut_slug)) {
+        if (!taxonomy_exists(FAND_FOURNISSEURS_ATTRIBUT)) {
 
             // Nom de l'attribut
             $attribut = array(
-                'slug' => $attribut_slug,
-                'name' => $nom_attribut,
+                'slug' => FAND_FOURNISSEURS_ATTRIBUT,
+                'name' => __('Provider', 'split-email-providers'),
                 'type' => 'select', // type de champ (select, radio, etc.)
                 'order_by' => 'menu_order', // tri des termes
                 'has_archives' => false,
@@ -24,22 +24,9 @@ class FAND_Attribut {
         }
     }
 
-    // Fonction pour ajouter des termes à l'attribut
-    /*static function add_term_attribut($slug,$term) {
-
-        // Vérifier si le terme existe déjà
-        $term_id = term_exists($term, sanitize_title($slug));
-
-        $args=[
-            'description'=>$term,
-        ];
-
-        // Si le terme n'existe pas, l'ajouter
-        if ($term_id==null) {
-           return wp_insert_term($term, $slug,$args);
-        }
-    }*/
+    // Fonction pour ajouter un terme à un attribut
     static function add_term_attribut($taxonomy, $term, $commercant_id = null) {
+        
         global $wpdb;
         //error_log('taxonomy :' . $taxonomy);
         //error_log('term :' . $term);
@@ -47,10 +34,9 @@ class FAND_Attribut {
 
         // Vérifier si le terme existe déjà
         $term_check = term_exists($term, $taxonomy);
-        $args = ['description' => $term];
-
+        
         if (!$term_check) {
-            $insert_result = wp_insert_term($term, $taxonomy, $args);
+            $insert_result = wp_insert_term($term, $taxonomy);
 
             if (is_wp_error($insert_result)) {
                 //error_log('Erreur wp_insert_term : ' . $insert_result->get_error_message());
@@ -65,10 +51,30 @@ class FAND_Attribut {
 
         //error_log('term_id :' . $term_id);
 
-        // Si WCFM est actif, on ajoute la relation commerçant <-> terme
-        if (FAND_MARKET_ACTIVE && $commercant_id !== null) {
-            marketutils::lier_commercant_au_terme($commercant_id, $term_id);
+        // Utilisation de REPLACE pour la Table 3 : plus propre et évite les doublons
+        if ($commercant_id !== null) {
+            $wpdb->replace(FAND_COMMERCANTS_TERMS, [
+                'commercant_id' => (int)$commercant_id,
+                'term_id'       => (int)$term_id,
+                'date_created'  => current_time('mysql')
+            ]);
         }
+        /*if ($commercant_id !== null && defined('FAND_COMMERCANTS_TERMS')) {
+        
+            $exists = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM " . FAND_COMMERCANTS_TERMS . " WHERE commercant_id = %d AND term_id = %d",
+                $commercant_id,
+                $term_id
+            ));
+
+            if (!$exists) {
+                $wpdb->insert(FAND_COMMERCANTS_TERMS, [
+                    'commercant_id' => (int)$commercant_id,
+                    'term_id'       => (int)$term_id,
+                    'date_created'  => current_time('mysql')
+                ]);
+            }
+        }*/
 
         return $term_id;
     }

@@ -6,6 +6,7 @@ use fand\Classes\FAND_Attribut;
 use fand\Classes\Database\Database;
 use fandmarket\FANDSettingsPageMarket;
 
+defined('ABSPATH') || exit;
 
 class FANDSettingsPage {
 
@@ -45,22 +46,23 @@ class FANDSettingsPage {
 		// Fix pour l'erreur "Translation loading too early" de WCFM Marketplace
 		add_filter('doing_it_wrong_trigger_error', '__return_false');
 
+		add_action('plugins_loaded', [Database::class, 'register_hooks']);
+
     }
 
 	// Fonction d'activation du plugin
 	static function onPluginActivation() {
-
-		// Definit le nom de l'attribut
-		$nom_attribut = 'fournisseur';
 		// Ajouter l'attribut s'il n'existe pas encore
-		FAND_Attribut::add_nouvel_attribut($nom_attribut,FAND_FOURNISSEURS_ATTRIBUT);
+		FAND_Attribut::add_new_taxo();
+		// Initialiser la base de données
 		Database::init();
 	}
 
 	static function get_fournisseurs_callback() {
         // Récupérer toutes les fournisseurs via la fonction Database::get_all_fournisseurs()
         $fournisseurs = Database::get_all_fournisseurs();
-        // Retourner les licences sous forme de JSON pour Vue.js
+		//error_log("Fournisseurs récupérés : " . print_r($fournisseurs, true));
+        // Retourner les fournisseurs sous forme de JSON pour Vue.js
 		wp_send_json_success($fournisseurs);
 		// Terminer l'exécution du script
 		wp_die();
@@ -69,8 +71,7 @@ class FANDSettingsPage {
 	static function delete_fournisseur_callback() {
         // Récupérer les données envoyées via POST
         $data = json_decode(file_get_contents('php://input'), true);
-		//error_log('Requête delete_fournisseur reçue.');
-		//error_log(print_r($_POST, true));
+		
         if (isset($data['fournisseur_id'])) {
             // Effectuez la suppression du fournisseur en fonction de la clé
             $alert=Database::delete_fournisseur($data); // Fonction à définir selon votre base de données
@@ -79,10 +80,10 @@ class FANDSettingsPage {
                     wp_send_json_success($alert);
                 } else {
                     // Réponse d'erreur
-                    wp_send_json_error(array('message' => 'Erreur lors de la suppression'));
+                    wp_send_json_error(array('message' =>__('Error during deletion.', 'split-email-providers') ));
                 }
             } else {
-                wp_send_json_error(array('message' => 'Clé de licence manquante'));
+                wp_send_json_error(array('message' => __('Key missing.', 'split-email-providers') ));
             }
     }
 
@@ -113,10 +114,10 @@ class FANDSettingsPage {
                     wp_send_json_success($alert);
                 } else {
                     // Réponse d'erreur
-                    wp_send_json_error(array('message' => 'Erreur lors de l\'ajout ou la modification'));
+                    wp_send_json_error(array('message' => __('Error adding or modifying provider.', 'split-email-providers') ));
                 }
             } else {
-                wp_send_json_error(array('message' => 'Clé de licence manquante'));
+                wp_send_json_error(array('message' => __('Key missing.', 'split-email-providers') ));
             }
 		
 	}
@@ -125,8 +126,8 @@ class FANDSettingsPage {
 
 		// Ajouter le menu principal "Fournisseurs"
 		add_menu_page(
-			'Fournisseurs', // Le titre de votre page de paramètres
-			'Fournisseurs', // Le nom du menu
+			__('Providers', 'split-email-providers'), // Le titre de votre page de paramètres
+			__('Providers', 'split-email-providers'), // Le nom du menu
 			'manage_options', // La capacité requise
 			'fand-settings', // Le slug de la page
 			[$this, 'render_tableau_fournisseurs_page'], // La fonction de rappel pour afficher le contenu de la page
@@ -160,25 +161,40 @@ class FANDSettingsPage {
 
 		// Chemin vers le fichier de traduction en fonction de la langue
 		$current_locale = get_user_locale();
-		$translations_file = plugin_dir_path(__FILE__) . 'languages/split-email-providers-' . $current_locale . '.json';
+		$translations = [
+			'domain' => 'split-email-providers',
+			'locale_data' => [
+				'split-email-providers' => [
+					'' => [
+						'domain' => 'split-email-providers',
+						'lang'   => $current_locale,
+					]
+				]
+			]
+		];
 
-		if (file_exists($translations_file)) {
-			$translations = json_decode(file_get_contents($translations_file), true);
-		} else {
-			// Si le fichier JSON n'existe pas, tu peux soit passer un tableau vide soit les traductions par défaut
-			$translations_file = plugin_dir_path(__FILE__) . 'languages/split-email-providers-en_US.json';
-			$translations = json_decode(file_get_contents($translations_file), true);
+		// On ne cherche le fichier que si ce n'est pas de l'anglais pur
+		if ($current_locale !== 'en_US') {
+			$translations_file = plugin_dir_path(__FILE__) . 'languages/split-email-providers-' . $current_locale . '.json';
+			if (file_exists($translations_file)) {
+				$file_content = json_decode(file_get_contents($translations_file), true);
+				if ($file_content) {
+					$translations = $file_content;
+				}
+			}
 		}
-			
-		// Création du tableau de données
+
 		$data_to_pass = [
-			'locale' => $current_locale,
-			'translations' => $translations,
-			'licenceStatus' => FAND_PRO_IMPORT_EXPORT_ENABLED,
+			'ajax_url'      => admin_url('admin-ajax.php'),
+			'locale'        => $current_locale,
+			'translations'  => $translations, // Ne sera plus jamais null
+			'licenceStatus' => defined('FAND_PRO_IMPORT_EXPORT_ENABLED') ? FAND_PRO_IMPORT_EXPORT_ENABLED : false,
+			'import_nonce'  => wp_create_nonce('import_fournisseurs_action'),
 		];
 	
 		// Passer les données à Vue.js
 		wp_localize_script('vue-app', 'FandProData', $data_to_pass);
+
 		// Ajouter la variable ajax_url dans le HTML
 		echo "<script type='text/javascript'>
 		var ajax_url = '" . esc_url(admin_url('admin-ajax.php')) . "';
@@ -190,7 +206,7 @@ class FANDSettingsPage {
 
 		// Vérification du nonce
 		if (isset($_GET['_wpnonce']) && !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'fournisseur_action')) {
-			wp_die(esc_html__('Échec de la vérification de sécurité.', 'split-email-providers'));
+			wp_die(esc_html__('Security check failed.', 'split-email-providers'));
 		}
 
 		echo '<div style="display: none;">';
@@ -385,7 +401,7 @@ class FANDSettingsPage {
 			//error_log('DEBUG EMAIL: produits=' . print_r($produits, true));
 			
 			// Ensuite tu inclus ton template
-			$email_body = include FAND_PLUGIN_DIR . 'Templates/email-fournisseur.php';
+			$fand_email_body = include FAND_PLUGIN_DIR . 'Templates/email-fournisseur.php';
 
 			$headers = [
 				'Content-Type: text/html; charset=UTF-8',
@@ -394,9 +410,9 @@ class FANDSettingsPage {
 			];
 
 
-			$sent = wp_mail($fournisseur_email, $email_subject, $email_body, $headers);
+			$sent = wp_mail($fournisseur_email, $email_subject, $fand_email_body, $headers);
 
-			error_log("Envoi à {$nom_fournisseur} ({$fournisseur_email}) : " . ($sent ? 'OK' : 'ECHEC'));
+			//error_log("Envoi à {$nom_fournisseur} ({$fournisseur_email}) : " . ($sent ? 'OK' : 'ECHEC'));
 		}
 	}
 

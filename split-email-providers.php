@@ -1,8 +1,9 @@
 <?php
 /* Plugin Name:        Split Email Providers
 * Description:         Gestion des envois d'emails aux fournisseurs
-* Version:             1.1.3
+* Version:             1.1.5
 * Requires at least:   6.8
+* Tested up to: 6.9  
 * Requires PHP:        8.2
 * Requires Plugins:    woocommerce
 * Author:              Fan-Develop
@@ -42,36 +43,41 @@ if (!class_exists('fand\\Classes\\Apifournisseur')) {
 }
 
 // Définition des constantes
-define('FAND_VERSION', '1.1.3');
+define('FAND_VERSION', '1.1.5');
 define('FAND_MAIN_FILE', __FILE__);
 define('FAND_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FAND_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('FAND_PRO_PLUGIN', 'split-email-providers-pro/split-email-providers-pro.php');
 define('FAND_MARKET_PLUGIN', 'split-email-providers-market/split-email-providers-market.php');
+
 // Vérification si la version Pro est active
 if (is_plugin_active(FAND_PRO_PLUGIN)) {
-
     define('FAND_PRO_ACTIVE', true);
 } else {
     define('FAND_PRO_ACTIVE', false);
 }
 
-// Vérification si la version Pro est active
-if (is_plugin_active(FAND_MARKET_PLUGIN)) {
-
-    define('FAND_MARKET_ACTIVE', true);
-} else {
+// Vérification si la version MARKET est active
+if (!defined('FAND_MARKET_ACTIVE')) {
     define('FAND_MARKET_ACTIVE', false);
 }
+
 //error_log('FAND_MARKET_ACTIVE :' .FAND_MARKET_ACTIVE);
 
 // Défini la table des fournisseurs
 global $wpdb;
 define('FAND_FOURNISSEURS_TABLE', $wpdb->prefix . 'fand_fournisseurs');
+// Table des adresses/relations (Celle où tu as tes données !)
+define('FAND_COMMERCANTS_FOURNISSEURS_TABLE', $wpdb->prefix . 'fand_commercants_fournisseurs');
+// Table des relations termes
+define('FAND_COMMERCANTS_TERMS', $wpdb->prefix . 'fand_commercants_terms');
 define('FAND_FOURNISSEURS_ATTRIBUT', 'pa_fournisseur');
+
 // Vérification si l'addon est activé
-if (!FAND_PRO_ACTIVE) {
-    define('FAND_PRO_IMPORT_EXPORT_ENABLED', false);
+if (!defined('FAND_PRO_ACTIVE') || !FAND_PRO_ACTIVE) {
+    if (!defined('FAND_PRO_IMPORT_EXPORT_ENABLED')) {
+        define('FAND_PRO_IMPORT_EXPORT_ENABLED', false);
+    }
 }
 
 // Sécurité : éviter l'accès direct

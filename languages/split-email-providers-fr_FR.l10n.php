@@ -58,7 +58,7 @@ return [
         'Are you sure you want to remove this provider?'=>'Êtes-vous sûr de vouloir supprimer ce fournisseur ?',
         'Add a provider'=>'Ajouter un fournisseur',
         'Change provider'=>'Modifier fournisseur',
-        'See provider'=>'Voir fournisseur',
+        'View provider'=>'Voir fournisseur',
         'Save'=>'Enregistrer',
         'Loading countries...'=>'Chargement des pays...',
         'Closed modal'=>'Modal fermée',

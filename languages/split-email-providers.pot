@@ -236,17 +236,17 @@ msgstr ""
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Change provider"
-msgstr ""
-
-#. Message plugins
-#: split-email-providers.php
 msgid "Add a provider"
 msgstr ""
 
 #. Message plugins
 #: split-email-providers.php
-msgid "See provider"
+msgid "Change provider"
+msgstr ""
+
+#. Message plugins
+#: split-email-providers.php
+msgid "View provider"
 msgstr ""
 
 #. Message plugins

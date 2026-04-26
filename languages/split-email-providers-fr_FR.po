@@ -244,7 +244,7 @@ msgstr "Modifier fournisseur"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "See provider"
+msgid "View provider"
 msgstr "Voir fournisseur"
 
 #. Message plugins

@@ -8,24 +8,24 @@
         </div>
         <div class="modal-body">
           <div v-if="fournisseurData && mode === 'view'">
-            <p><strong>{{ translate('Nom') }} : </strong> {{ fournisseurData.nom }}</p>
-            <p><strong>{{ translate('Adresse') }} : </strong> {{ fournisseurData.adresse }}</p>
-            <p><strong>{{ translate('CP') }} : </strong> {{ fournisseurData.cp }}</p>
-            <p><strong>{{ translate('Ville') }} : </strong> {{ fournisseurData.ville }}</p>
-            <p><strong>{{ translate('Pays') }} : </strong> {{ fournisseurData.pays }}</p>
+            <p><strong>{{ translate('Name') }} : </strong> {{ fournisseurData.nom }}</p>
+            <p><strong>{{ translate('Address') }} : </strong> {{ fournisseurData.adresse }}</p>
+            <p><strong>{{ translate('Postal Code') }} : </strong> {{ fournisseurData.cp }}</p>
+            <p><strong>{{ translate('City') }} : </strong> {{ fournisseurData.ville }}</p>
+            <p><strong>{{ translate('Country') }} : </strong> {{ fournisseurData.pays }}</p>
             <p><strong>{{ translate('Email') }} : </strong> {{ fournisseurData.email }}</p>
-            <p><strong>{{ translate('Téléphone') }} : </strong> {{ fournisseurData.telephone }}</p>
+            <p><strong>{{ translate('Phone') }} : </strong> {{ fournisseurData.telephone }}</p>
           </div>
           <div v-else>
             <!-- Formulaire de modification -->
 
             <input type="hidden" v-model="fournisseurData.id" class="form-control">
-            <input type="text" v-model="fournisseurData.nom" class="form-control mt-2" :placeholder="translate('Nom')" required>
-            <input type="text" v-model="fournisseurData.adresse" class="form-control mt-2" :placeholder="translate('Adresse')">
-            <input type="text" v-model="fournisseurData.cp" class="form-control mt-2" :placeholder="translate('CP')">
-            <input type="text" v-model="fournisseurData.ville" class="form-control mt-2" :placeholder="translate('Ville')">
+            <input type="text" v-model="fournisseurData.nom" class="form-control mt-2" :placeholder="translate('Name')" required>
+            <input type="text" v-model="fournisseurData.adresse" class="form-control mt-2" :placeholder="translate('Address')">
+            <input type="text" v-model="fournisseurData.cp" class="form-control mt-2" :placeholder="translate('Postal Code')">
+            <input type="text" v-model="fournisseurData.ville" class="form-control mt-2" :placeholder="translate('City')">
             <div class="form-group mt-2" v-if="countries && Object.keys(countries).length > 0">
-              <label for="country">{{ translate('Pays') }} : </label>
+              <label for="country">{{ translate('Country') }} : </label>
               <select id="country" v-model="fournisseurData.pays" class="form-control">
                 <option v-for="(name, code) in countries" :key="code" :value="code">
                   {{ name }}
@@ -33,14 +33,14 @@
               </select>
             </div>
             <div v-else>
-              <p>{{ translate('Chargement des pays...') }}</p>
+              <p>{{ translate('load country...') }}</p>
             </div>
             <input type="text" v-model="fournisseurData.email" class="form-control mt-2" :placeholder="translate('Email')" required>
-            <input type="text" v-model="fournisseurData.telephone" class="form-control mt-2" :placeholder="translate('Téléphone')">
+            <input type="text" v-model="fournisseurData.telephone" class="form-control mt-2" :placeholder="translate('Phone')">
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" v-if="mode !== 'view'" @click="saveChanges">{{ translate('Enregistrer') }}</button>
+          <button type="button" class="btn btn-primary" v-if="mode !== 'view'" @click="saveChanges">{{ translate('Register') }}</button>
         </div>
       </div>
     </div>
@@ -80,11 +80,11 @@ export default {
     modalTitle() {
       switch (this.mode) {
         case 'edit':
-          return 'Modifier fournisseur';
+          return 'Change provider';
         case 'add':
-          return 'Ajouter un fournisseur';
+          return 'Add a provider';
         default:
-          return 'Voir fournisseur';
+          return 'View provider';
       }
     },
   },
@@ -119,7 +119,7 @@ export default {
       const missingFields = requiredFields.filter((field) => !this.fournisseurData[field]);
       if (missingFields.length > 0) {
         const translatedFields = missingFields.map((field) => this.translate(field));
-        alert(`${this.translate('Veuillez remplir les champs obligatoires')} : ${translatedFields.join(', ')}`);
+        alert(`${this.translate('Please fill in the required fields')} : ${translatedFields.join(', ')}`);
         return false;
       }
       return true;

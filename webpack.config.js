@@ -5,7 +5,7 @@ const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 module.exports = {
   entry: './src/index.js', // Fichier d'entrée de votre application
   output: {
-    filename: 'bundle.js', // Nom du fichier de sortie
+    filename: 'tableauFournisseurs.js', // Nom du fichier de sortie
     path: path.resolve(__dirname, 'dist'), // Dossier de sortie
     publicPath: '/wp-content/plugins/split-email-providers/dist/', // URL publique pour accéder au fichier
   },

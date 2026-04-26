@@ -114,7 +114,7 @@ class Database {
         $term_id = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $user_id);
 
         return [
-            'message' => __('Supplier added and linked successfully.', 'split-email-providers'), 
+            'message' => __('Provider added successfully!', 'split-email-providers'), 
             'message_type' => 'success'
         ];
     }
@@ -327,7 +327,7 @@ class Database {
         }
 
         return [
-            'message' => __('Provider updated and attributes restored if missing.', 'split-email-providers'),
+            'message' => __('Provider updated successfully!', 'split-email-providers'),
             'message_type' => 'success'
         ];
     }
@@ -455,7 +455,7 @@ class Database {
         }
 
         return [
-            'message' => __('Provider and associated attribute deleted successfully.', 'split-email-providers'),
+            'message' => __('Provider deleted successfully.', 'split-email-providers'),
             'message_type' => 'success'
         ];
     }

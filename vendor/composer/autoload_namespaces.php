@@ -6,4 +6,11 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+<<<<<<< HEAD
+=======
+    'cli' => array($vendorDir . '/wp-cli/php-cli-tools/lib'),
+    'WP_CLI\\' => array($vendorDir . '/wp-cli/wp-cli/php'),
+    'Mustache' => array($vendorDir . '/mustache/mustache/src'),
+    'HTTP_Request2' => array($vendorDir . '/pear/http_request2'),
+>>>>>>> dfc056699f96fab491b5225c4e3332c6cfa91b70
 );

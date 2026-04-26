@@ -72,6 +72,10 @@ define('FAND_COMMERCANTS_FOURNISSEURS_TABLE', $wpdb->prefix . 'fand_commercants_
 // Table des relations termes
 define('FAND_COMMERCANTS_TERMS', $wpdb->prefix . 'fand_commercants_terms');
 define('FAND_FOURNISSEURS_ATTRIBUT', 'pa_fournisseur');
+// Vérification si l'addon est activé
+if (!FAND_PRO_ACTIVE) {
+    define('FAND_PRO_IMPORT_EXPORT_ENABLED', false);
+}
 
 // Vérification si l'addon est activé
 if (!defined('FAND_PRO_ACTIVE') || !FAND_PRO_ACTIVE) {

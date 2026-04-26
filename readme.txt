@@ -1,10 +1,17 @@
 === Split Email Providers ===
 Donate link: https://fan-develop.fr
 Tags: WooCommerce, supplier, email, supplier management
+<<<<<<< HEAD
 Requires at least: 6.8
 Tested up to: 6.9
 Requires PHP: 8.2
 Stable tag: 1.1.5
+=======
+Requires at least: 5.0
+Tested up to: 6.8
+Requires PHP: 8.2
+Stable tag: 1.1.2
+>>>>>>> dfc056699f96fab491b5225c4e3332c6cfa91b70
 Requires Plugins: woocommerce
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,7 +42,11 @@ Main features:
 
 Automatic email sending to suppliers: With every order, emails are sent to the relevant suppliers with the details of their products.
 
+<<<<<<< HEAD
 Seamless Integration: Works directly with WooCommerce without requiring complex configuration.
+=======
+Seamless integration: Works directly with WooCommerce without complicated configuration.
+>>>>>>> dfc056699f96fab491b5225c4e3332c6cfa91b70
 
 Split orders by supplier based on the products in each order.
 
@@ -53,6 +64,7 @@ Redirect orders to your store (ideal for assembling or checking before customer 
 
 Low stock email alerts: Automatically send an email to a supplier when a product stock drops below a minimum threshold.
 
+<<<<<<< HEAD
 🔗 Access the premium version here: [Split Email Providers](https://split-email-providers.com/)
 
 For multi-vendor marketplaces, discover **Split Market**:
@@ -61,6 +73,9 @@ For multi-vendor marketplaces, discover **Split Market**:
 - Automatic emails sent to suppliers per seller, with a copy to the seller
 
 🔗 Discover the premium version here: [Split Market] (https://split-email-providers.com/)
+=======
+🔗 Access the premium version here: Split Email Providers
+>>>>>>> dfc056699f96fab491b5225c4e3332c6cfa91b70
 
 == Installation ==
 
@@ -83,9 +98,12 @@ Yes — Split Email Providers is designed specifically for WooCommerce stores.
 = Does the addon send emails automatically? =
 Yes — as soon as an order is placed and validated, the addon detects the supplier’s products and sends the emails automatically.
 
+<<<<<<< HEAD
 = Is the seller notified when their suppliers receive an email? =
 Yes, the seller is systematically copied on emails sent to their suppliers.
 
+=======
+>>>>>>> dfc056699f96fab491b5225c4e3332c6cfa91b70
 = Can the content of the supplier emails be customized? =
 No — advanced email customization is coming very soon in the Pro version.
 
@@ -111,6 +129,7 @@ Supplier email – 📨 Example of an automatic email sent to a supplier with th
 
 == Changelog ==
 
+<<<<<<< HEAD
 = 1.1.5 =
 Added split email provider market compatibility for WCFM anglais d’origine
 
@@ -120,6 +139,8 @@ Compatible with WordPress 6.9
 = 1.1.3 =
 Added split email provider market compatibility for WCFM
 
+=======
+>>>>>>> dfc056699f96fab491b5225c4e3332c6cfa91b70
 = 1.1.2 =
 Requires Plugins: woocommerce
 

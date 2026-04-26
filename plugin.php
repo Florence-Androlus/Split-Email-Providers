@@ -194,7 +194,6 @@ class FANDSettingsPage {
 	
 		// Passer les données à Vue.js
 		wp_localize_script('vue-app', 'FandProData', $data_to_pass);
-
 		// Ajouter la variable ajax_url dans le HTML
 		echo "<script type='text/javascript'>
 		var ajax_url = '" . esc_url(admin_url('admin-ajax.php')) . "';

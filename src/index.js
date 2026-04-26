@@ -1,5 +1,7 @@
 // Importation de Vue et du composant principal
-import { createApp } from 'vue';
-import App from '../Templates/tableau-fournisseurs.vue'; // Assurez-vous que ce chemin est correct
+import Vue from 'vue';
+import App from '../Templates/tableau-fournisseurs.vue'; // ou ton composant principal
 
-const app = createApp(App).mount('#app');
+new Vue({
+  render: h => h(App),
+}).$mount('#app'); // remplace #app par l'ID de ton div

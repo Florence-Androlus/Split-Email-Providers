@@ -24,6 +24,12 @@ msgstr ""
 msgid "Split Email Providers"
 msgstr ""
 
+#. Author URI of the plugin
+#. Plugin Name of the plugin
+#: split-email-providers.php
+msgid "Managing email communications to Providers"
+msgstr ""
+
 #. Author of the plugin
 #: split-email-providers.php
 msgid "Fan-Develop"
@@ -261,12 +267,22 @@ msgstr ""
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Veuillez remplir les champs obligatoires"
+msgid "Please fill in the required fields"
 msgstr ""
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Veuillez renseigner ce champ."
+msgid "Please fill in this field."
+msgstr ""
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Register"
+msgstr ""
+
+#. Message plugins
+#: split-email-providers.php
+msgid "A provider with this email already exists."
 msgstr ""
 
 #. Message plugins
@@ -294,38 +310,7 @@ msgstr ""
 msgid "of"
 msgstr ""
 
-#. Importation plugins
-#: split-email-providers.php
-msgid "Importing providers"
-msgstr ""
 
-#. Importation plugins
-#: split-email-providers.php
-msgid "Importing..."
-msgstr ""
 
-#. Importation plugins
-#: split-email-providers.php
-msgid "Veuillez sélectionner un fichier CSV."
-msgstr ""
 
-#. Exportation plugins
-#: split-email-providers.php
-msgid "Aucun fournisseur à exporter."
-msgstr ""
-
-#. Cle licence plugins
-#: split-email-providers.php
-msgid "Saisie de la clé de licence"
-msgstr ""
-
-#. Cle licence plugins
-#: split-email-providers.php
-msgid "Clé de licence :"
-msgstr ""
-
-#. Cle licence plugins
-#: split-email-providers.php
-msgid "Enregistrer la clé"
-msgstr ""
 

@@ -25,7 +25,42 @@ class FAND_Attribut {
     }
 
     // Fonction pour ajouter un terme à un attribut
-    static function add_term_attribut($taxonomy, $term, $commercant_id = null) {
+    static function add_term_attribut($taxonomy, $term, $commercant_id = null, $term_slug = null) {
+        
+        global $wpdb;
+
+        // Chercher par slug si fourni (plus fiable que le nom)
+        if ($term_slug) {
+            $term_check = get_term_by('slug', $term_slug, $taxonomy);
+            $term_check = $term_check ? ['term_id' => $term_check->term_id] : null;
+        } else {
+            $term_check = term_exists($term, $taxonomy);
+        }
+        
+        if (!$term_check) {
+            $args = ['slug' => $term_slug ?? sanitize_title($term)];
+            $insert_result = wp_insert_term($term, $taxonomy, $args);
+
+            if (is_wp_error($insert_result)) {
+                return null;
+            }
+
+            $term_id = $insert_result['term_id'];
+        } else {
+            $term_id = is_array($term_check) ? $term_check['term_id'] : $term_check;
+        }
+
+        if ($commercant_id !== null) {
+            $wpdb->replace(FAND_COMMERCANTS_TERMS, [
+                'commercant_id' => (int)$commercant_id,
+                'term_id'       => (int)$term_id,
+                'date_created'  => current_time('mysql')
+            ]);
+        }
+
+        return $term_id;
+    }
+    /*static function add_term_attribut($taxonomy, $term, $commercant_id = null) {
         
         global $wpdb;
         //error_log('taxonomy :' . $taxonomy);
@@ -76,8 +111,8 @@ class FAND_Attribut {
             }
         }*/
 
-        return $term_id;
-    }
+    /*    return $term_id;
+    }*/
 
 
     // Fonction pour mettre à jour un terme dans l'attribut

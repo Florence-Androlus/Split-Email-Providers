@@ -11,6 +11,7 @@ return [
     'messages'=>[
         'https://fan-develop.fr/'=>'https://fan-develop.fr/',
         'Split Email Providers'=>'Split Email Providers',
+        'Managing email communications to Providers'=>'Gestion des envois d\'emails aux fournisseurs',
         'Security check failed.'=>'Échec de la vérification de sécurité.',
         'Nonce not valid for vendor deletion.'=>'Nonce non valide pour la suppression du fournisseur.',
         'Invalid nonce for provider update.'=>'Nonce non valide pour la mise à jour du fournisseur.',
@@ -63,7 +64,9 @@ return [
         'Loading countries...'=>'Chargement des pays...',
         'Closed modal'=>'Modal fermée',
         'Please fill in the required fields'=>'Veuillez remplir les champs obligatoires',
-        'Veuillez renseigner ce champ.'=>'Veuillez renseigner ce champ.',
+        'Please fill in this field.'=>'Veuillez renseigner ce champ.',
+        'Register'=>'Enregistrer',
+        'A provider with this email already exists.'=>'Un fournisseur associé à cette adresse e-mail existe déjà.',
         'Previous'=>'Précédent',
         'Next'=>'Suivant',
         'Page'=>'Page',

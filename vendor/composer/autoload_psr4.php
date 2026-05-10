@@ -10,10 +10,4 @@ return array(
     'fandpro\\' => array($baseDir . '/../split-email-providers-pro'),
     'fand\\Classes\\' => array($baseDir . '/Classes'),
     'fand\\' => array($baseDir . '/'),
-<<<<<<< HEAD
-=======
-    'Symfony\\Component\\Finder\\' => array($vendorDir . '/symfony/finder'),
-    'Mustangostang\\' => array($vendorDir . '/wp-cli/mustangostang-spyc/src'),
-    'Automattic\\WooCommerce\\' => array($vendorDir . '/automattic/woocommerce/src/WooCommerce'),
->>>>>>> dfc056699f96fab491b5225c4e3332c6cfa91b70
 );

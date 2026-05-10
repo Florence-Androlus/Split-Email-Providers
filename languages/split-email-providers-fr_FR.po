@@ -23,6 +23,12 @@ msgstr ""
 msgid "Split Email Providers"
 msgstr "Split Email Providers"
 
+#. Author URI of the plugin
+#. Plugin Name of the plugin
+#: split-email-providers.php
+msgid "Managing email communications to Providers"
+msgstr "Gestion des envois d'emails aux fournisseurs"
+
 #: plugin.php:86
 msgid "Security check failed."
 msgstr "Échec de la vérification de sécurité."
@@ -264,8 +270,18 @@ msgstr "Veuillez remplir les champs obligatoires"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Veuillez renseigner ce champ."
+msgid "Please fill in this field."
 msgstr "Veuillez renseigner ce champ."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Register"
+msgstr "Enregistrer"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "A provider with this email already exists."
+msgstr "Un fournisseur associé à cette adresse e-mail existe déjà."
 
 #. Message plugins
 #: split-email-providers.php
@@ -291,38 +307,3 @@ msgstr "Page"
 #: split-email-providers.php
 msgid "of"
 msgstr "sur"
-
-#. Importation plugins
-#: split-email-providers.php
-msgid "Importing providers"
-msgstr "Importation de Fournisseurs"
-
-#. Importation plugins
-#: split-email-providers.php
-msgid "Importing..."
-msgstr "Importation..."
-
-#. Importation plugins
-#: split-email-providers.php
-msgid "Veuillez sélectionner un fichier CSV."
-msgstr "Veuillez sélectionner un fichier CSV."
-
-#. Exportation plugins
-#: split-email-providers.php
-msgid "Aucun fournisseur à exporter."
-msgstr "Aucun fournisseur à exporter."
-
-#. Cle licence plugins
-#: split-email-providers.php
-msgid "Saisie de la clé de licence"
-msgstr "Saisie de la clé de licence"
-
-#. Cle licence plugins
-#: split-email-providers.php
-msgid "Clé de licence :"
-msgstr "Clé de licence "
-
-#. Cle licence plugins
-#: split-email-providers.php
-msgid "Enregistrer la clé"
-msgstr "Enregistrer la clé"

@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 			<div style="background-color:#f0f0f0; padding:20px; text-align:center;">
 
-				<img src="' . $shop_logo_url . '" alt="Logo de la boutique" style="max-width:150px;"/>
+				<img src="' . esc_url($shop_logo_url) . '" alt="Logo" style="max-width: 150px; max-height: 80px; width: auto; height: auto; display: inline-block;" />
 
 			</div>
 
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 				<p><strong>Coordonnées de la boutique :</strong></p>
 
-				<p>' . $shop_name . '<br>' . $shop_address . '<br><strong>Ref :</strong> ' . $order->get_order_number() . '</p>
+				<p>' . esc_html($shop_name) . '<br>' . esc_html($shop_address) . '<br><strong>Ref :</strong> ' . esc_html($order->get_order_number()) . '</p>
 
 			</div>
 
@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 			<div style="padding:20px;">
 
-				<p>Bonjour ' . $nom_fournisseur . ', vous avez une nouvelle commande avec les produits suivants :</p>
+				<p>Bonjour ' . esc_html($nom_fournisseur) . ', vous avez une nouvelle commande avec les produits suivants :</p>
 
 				<table border="1" cellpadding="10" cellspacing="0" style="border-collapse:collapse; width:100%;">
 
@@ -83,10 +83,10 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 				<br>';
 
 				if ($send_shop_address==1) {
-					$email_body .= '<p><strong>Adresse de livraison :</strong><br>' . $shop_address . '</p>';
+					$email_body .= '<p><strong>Adresse de livraison :</strong><br>' . esc_html($shop_address) . '</p>';
 				}
 				else{
-					$email_body .= '<p><strong>Adresse de livraison :</strong><br>' . $shipping_address . '</p>';
+					$email_body .= '<p><strong>Adresse de livraison :</strong><br>' . esc_html($shipping_address) . '</p>';
 				}
 
 				$email_body .= '<br>

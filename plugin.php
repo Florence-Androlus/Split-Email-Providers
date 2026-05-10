@@ -13,10 +13,12 @@ class FANDSettingsPage {
     public function init() {
 		// déclaration du hook d'activation du plugin
 		register_activation_hook(FAND_MAIN_FILE, [$this,'onPluginActivation']);
+		
 		//Enregistrement du hook pour enqueuer les scripts seulement dans l'administration
 		add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
+
 		// Register the settings page.
-		add_action( 'admin_menu', [$this,'register_fournisseurs_menu' ], 5 );
+		add_action( 'admin_menu', [$this,'register_fournisseurs_menu' ], 20 );
 
 		// Ajouter l'action pour envoyer un email après le paiement complet de la commande
 		add_action('woocommerce_payment_complete', [$this,'envoyer_email_fournisseur_apres_paiement']);
@@ -123,7 +125,7 @@ class FANDSettingsPage {
 	}
 
 	public function register_fournisseurs_menu() {
-
+	
 		// Ajouter le menu principal "Fournisseurs"
 		add_menu_page(
 			__('Providers', 'split-email-providers'), // Le titre de votre page de paramètres
@@ -187,13 +189,13 @@ class FANDSettingsPage {
 		$data_to_pass = [
 			'ajax_url'      => admin_url('admin-ajax.php'),
 			'locale'        => $current_locale,
-			'translations'  => $translations, // Ne sera plus jamais null
-			'licenceStatus' => defined('FAND_PRO_IMPORT_EXPORT_ENABLED') ? FAND_PRO_IMPORT_EXPORT_ENABLED : false,
+			'translations'  => $translations, 
+			'licenceStatus' => defined('FAND_PRO_IMPORT_EXPORT_ENABLED') && FAND_PRO_IMPORT_EXPORT_ENABLED,
 			'import_nonce'  => wp_create_nonce('import_fournisseurs_action'),
 		];
 	
 		// Passer les données à Vue.js
-		wp_localize_script('vue-app', 'FandProData', $data_to_pass);
+		wp_localize_script('vue-app', 'FandData', $data_to_pass);
 		// Ajouter la variable ajax_url dans le HTML
 		echo "<script type='text/javascript'>
 		var ajax_url = '" . esc_url(admin_url('admin-ajax.php')) . "';
@@ -238,7 +240,7 @@ class FANDSettingsPage {
 		$send_shop_address = 0;
 		
 		// Options addon
-		if (is_plugin_active(FAND_PRO_PLUGIN)) {
+		if (defined('FAND_PRO_IMPORT_EXPORT_ENABLED') && FAND_PRO_IMPORT_EXPORT_ENABLED) {
 			$show_price_column = get_option('split_email_add_price');
 			$send_shop_address = get_option('split_email_send_shop_address');
 		} 
@@ -320,10 +322,21 @@ class FANDSettingsPage {
 					$fournisseur_term = $terms[0];
 					$fournisseur_nom  = $fournisseur_term->name;
 
-					$fournisseur_email_row = $wpdb->get_row($wpdb->prepare(
-						"SELECT email FROM " . FAND_FOURNISSEURS_TABLE . " WHERE nom = %s",
-						$fournisseur_nom
-					));
+					// Extraire l'ID depuis le slug "fournisseur-{id}"
+					$fournisseur_id = intval(str_replace('fournisseur-', '', $fournisseur_term->slug));
+
+					if ($fournisseur_id) {
+						$fournisseur_email_row = $wpdb->get_row($wpdb->prepare(
+							"SELECT email FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id = %d",
+							$fournisseur_id
+						));
+					} else {
+						// Fallback pour les anciens termes sans slug normalisé
+						$fournisseur_email_row = $wpdb->get_row($wpdb->prepare(
+							"SELECT email FROM " . FAND_FOURNISSEURS_TABLE . " WHERE nom = %s",
+							$fournisseur_nom
+						));
+					}
 
 					if (!$fournisseur_email_row || empty($fournisseur_email_row->email)) {
 						error_log("[SplitEmail] Pas d'email fournisseur trouvé pour $fournisseur_nom");
@@ -404,7 +417,7 @@ class FANDSettingsPage {
 
 			$headers = [
 				'Content-Type: text/html; charset=UTF-8',
-				'From: ' . ($vendeur['nom'] ?? get_bloginfo('name')) . ' <' . ($vendeur['email'] ?? get_option('admin_email')) . '>',
+				'From: ' . (isset($vendeur) ? $vendeur['nom'] : get_bloginfo('name')) . ' <' . (isset($vendeur) ? $vendeur['email'] : get_option('admin_email')) . '>',
 				'Cc: ' . get_option('admin_email')
 			];
 

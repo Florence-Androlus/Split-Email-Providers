@@ -17,7 +17,8 @@ class Database {
         $sql1 = "CREATE TABLE " . FAND_FOURNISSEURS_TABLE . " (
             id INT AUTO_INCREMENT PRIMARY KEY,
             nom VARCHAR(255) NOT NULL,
-            email VARCHAR(100)
+            email VARCHAR(100),
+            UNIQUE KEY unique_email (email)
         ) $charset_collate;";
         dbDelta($sql1);
 
@@ -31,7 +32,8 @@ class Database {
             ville VARCHAR(100),
             pays VARCHAR(100),
             telephone VARCHAR(20),
-            note_personnelle TEXT
+            note_personnelle TEXT,
+            UNIQUE KEY unique_link (commercant_id, fournisseur_id)
         ) $charset_collate;";
         dbDelta($sql2);
 
@@ -78,7 +80,7 @@ class Database {
         // car on veut garder les coordonnées SQL même si l'attribut produit est supprimé.
     }
 
-    static function add_fournisseur($data) {
+    /*static function add_fournisseur($data) {
         global $wpdb;
         $user_id = get_current_user_id() ?: 1;
         $email = sanitize_email($data['email'] ?? '');
@@ -88,8 +90,8 @@ class Database {
 
         // 1. Table 1 : Identité
         $f_id = $wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM " . FAND_FOURNISSEURS_TABLE . " WHERE email = %s OR nom = %s",
-            $email, $nom
+            "SELECT id FROM " . FAND_FOURNISSEURS_TABLE . " WHERE email = %s",
+            $email
         ));
 
         if (!$f_id) {
@@ -111,211 +113,117 @@ class Database {
 
         // 3. Table 3 : Liaison Terms (C'est ici qu'on sécurise)
         // On crée/récupère le term_id via ta classe FAND_Attribut
-        $term_id = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $user_id);
+        $term_slug = 'fournisseur-' . $f_id;
+        $term_id = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $user_id, $term_slug);
 
         return [
             'message' => __('Provider added successfully!', 'split-email-providers'), 
             'message_type' => 'success'
         ];
-    }
-
-    /*static function add_fournisseur($data) {
+    }*/
+    static function add_fournisseur($data) {
         global $wpdb;
-        $user_id = get_current_user_id() ? get_current_user_id() : 1; // Fallback admin
-
+        $user_id = get_current_user_id() ?: 1;
         $email = sanitize_email($data['email'] ?? '');
         $nom   = sanitize_text_field($data['nom'] ?? '');
 
-        // 1. Est-ce que le fournisseur existe globalement ?
+        if (empty($nom)) return ['message' => 'Nom vide', 'message_type' => 'error'];
+
+        // 1. Vérifier si l'email existe déjà
         $f_id = $wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM " . FAND_FOURNISSEURS_TABLE . " WHERE email = %s OR nom = %s",
-            $email, $nom
+            "SELECT id FROM " . FAND_FOURNISSEURS_TABLE . " WHERE email = %s",
+            $email
         ));
 
-        if (!$f_id) {
-            $wpdb->insert(FAND_FOURNISSEURS_TABLE, ['nom' => $nom, 'email' => $email]);
-            $f_id = $wpdb->insert_id;
-        }
-
-        // 2. Créer ou Mettre à jour la liaison (Adresses)
-        // C'est CA qui permet à get_all_fournisseurs de fonctionner après
-        $exists_link = $wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM " . FAND_COMMERCANTS_FOURNISSEURS_TABLE . " WHERE commercant_id = %d AND fournisseur_id = %d",
-            $user_id, $f_id
-        ));
-
-        $link_data = [
-            'commercant_id'  => $user_id,
-            'fournisseur_id' => $f_id,
-            'adresse'        => sanitize_text_field($data['adresse'] ?? ''),
-            'cp'             => sanitize_text_field($data['cp'] ?? ''),
-            'ville'          => sanitize_text_field($data['ville'] ?? ''),
-            'pays'           => sanitize_text_field($data['pays'] ?? ''),
-            'telephone'      => sanitize_text_field($data['telephone'] ?? ''),
-        ];
-
-        if ($exists_link) {
-            $wpdb->update(FAND_COMMERCANTS_FOURNISSEURS_TABLE, $link_data, ['id' => $exists_link]);
-            $message = __('Link updated.', 'split-email-providers');
-        } else {
-            $wpdb->insert(FAND_COMMERCANTS_FOURNISSEURS_TABLE, $link_data);
-            $message = __('Supplier added and linked.', 'split-email-providers');
-        }
-
-        // 3. Gestion des Attributs (Terms)
-        FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, (FAND_MARKET_ACTIVE ? $user_id : null));
-
-        return ['message' => $message, 'message_type' => 'success'];
-    }
-
-    /*static public function update_fournisseur($data){
-        global $wpdb;
-
-        $data = [
-            'fournisseur_id' => isset($data['id']) ? intval($data['id']) : 0,
-            'nom'            => isset($data['nom']) ? sanitize_text_field($data['nom']) : '',
-            'adresse'        => isset($data['adresse']) ? stripslashes(sanitize_text_field($data['adresse'])) : '',
-            'cp'             => isset($data['cp']) ? sanitize_text_field($data['cp']) : '',
-            'ville'          => isset($data['ville']) ? stripslashes(sanitize_text_field($data['ville'])) : '',
-            'pays'           => isset($data['pays']) ? sanitize_text_field($data['pays']) : '',
-            'email'          => isset($data['email']) ? sanitize_email($data['email']) : '',
-            'telephone'      => isset($data['telephone']) ? sanitize_text_field($data['telephone']) : ''
-        ];
-
-        extract($data);
-
-        // Ancien nom (pour update du term)
-        $ancien_fournisseur = $wpdb->get_row(
-            $wpdb->prepare("SELECT nom FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id = %d", $fournisseur_id)
-        );
-        $ancien_nom = $ancien_fournisseur ? $ancien_fournisseur->nom : '';
-
-        if (FAND_MARKET_ACTIVE) {
-            // maj infos globales
-            $result = $wpdb->update(
-                FAND_FOURNISSEURS_TABLE,
-                [
-                    'nom'   => $nom,
-                    'email' => $email,
-                ],
-                ['id' => $fournisseur_id]
-            );
-
-            $commercant_id = get_current_user_id();
-
-            $infos = [
-                'adresse'   => $adresse,
-                'cp'        => $cp,
-                'ville'     => $ville,
-                'pays'      => $pays,
-                'telephone' => $telephone,
+        if ($f_id) {
+            return [
+                'message'      => __('A provider with this email already exists.', 'split-email-providers'),
+                'message_type' => 'error'
             ];
-
-            marketutils::enregistrer_relation_commercant_fournisseur($fournisseur_id, $commercant_id, $infos);
-        } 
-        else {
-            // Mode simple → mise à jour directe
-            $result = $wpdb->update(
-                FAND_FOURNISSEURS_TABLE,
-                [
-                    'nom'       => $nom,
-                    'adresse'   => $adresse,
-                    'cp'        => $cp,
-                    'ville'     => $ville,
-                    'pays'      => $pays,
-                    'email'     => $email,
-                    'telephone' => $telephone,
-                ],
-                ['id' => $fournisseur_id]
-            );
         }
 
-        // Retour messages
-        if ($result !== false) {
-            $message = __('Provider updated successfully!', 'split-email-providers');
-            $message_type = 'success';
+        // 2. Créer le fournisseur
+        $wpdb->insert(FAND_FOURNISSEURS_TABLE, ['nom' => $nom, 'email' => $email]);
+        $f_id = $wpdb->insert_id;
 
-            // Logique de mise à jour du terme (Taxonomie)
-            if ($ancien_nom && $ancien_nom !== $nom) {
-                $term = get_term_by('name', $ancien_nom, FAND_FOURNISSEURS_ATTRIBUT); 
-                if ($term) {
-                    FAND_Attribut::update_term_attribut(
-                        FAND_FOURNISSEURS_ATTRIBUT,
-                        $ancien_nom,
-                        [
-                            'name' => $nom,
-                            'slug' => sanitize_title($nom),
-                        ]
-                    );
-                }
-            }
-        } else {
-            // Ici $result est strictement FALSE (erreur de requête SQL)
-            $message = __('Error updating provider.', 'split-email-providers');
-            $message_type = 'error'; // Pas besoin de __() ici, c'est une clé technique pour ton CSS
-        }
+        // 3. Table 2 : Coordonnées
+        $wpdb->insert(FAND_COMMERCANTS_FOURNISSEURS_TABLE, [
+            'commercant_id'    => $user_id,
+            'fournisseur_id'   => $f_id,
+            'adresse'          => sanitize_text_field($data['adresse'] ?? ''),
+            'cp'               => sanitize_text_field($data['cp'] ?? ''),
+            'ville'            => sanitize_text_field($data['ville'] ?? ''),
+            'pays'             => sanitize_text_field($data['pays'] ?? ''),
+            'telephone'        => sanitize_text_field($data['telephone'] ?? ''),
+            'note_personnelle' => sanitize_textarea_field($data['note_personnelle'] ?? '')
+        ]);
 
-        return ['message' => $message, 'message_type' => $message_type];
-    }*/
+        // 4. Table 3 : Liaison Terms
+        $term_slug = 'fournisseur-' . $f_id;
+        $term_id   = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $user_id, $term_slug);
 
+        return [
+            'message'      => __('Provider added successfully!', 'split-email-providers'),
+            'message_type' => 'success'
+        ];
+    }
+    
     static public function update_fournisseur($data) {
         global $wpdb;
 
         $fournisseur_id = isset($data['id']) ? intval($data['id']) : 0;
-        $commercant_id = get_current_user_id() ?: 1;
-        $nom_nouveau = sanitize_text_field($data['nom'] ?? '');
+        $commercant_id  = get_current_user_id() ?: 1;
+        $nom_nouveau    = sanitize_text_field($data['nom'] ?? '');
 
         if ($fournisseur_id === 0 || empty($nom_nouveau)) {
             return ['message' => __('Invalid data.', 'split-email-providers'), 'message_type' => 'error'];
         }
 
-        // 1. On récupère les infos actuelles en base
-        $fournisseur_actuel = $wpdb->get_row($wpdb->prepare(
-            "SELECT nom FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id = %d",
-            $fournisseur_id
-        ));
+        // 1. Mise à jour des tables SQL (Identité et Coordonnées)
+        $wpdb->update(
+            FAND_FOURNISSEURS_TABLE,
+            ['nom' => $nom_nouveau, 'email' => sanitize_email($data['email'] ?? '')],
+            ['id' => $fournisseur_id]
+        );
 
-        // 2. Mise à jour des tables SQL (Identité et Coordonnées)
-        $wpdb->update(FAND_FOURNISSEURS_TABLE, ['nom' => $nom_nouveau, 'email' => sanitize_email($data['email'] ?? '')], ['id' => $fournisseur_id]);
-        
         $wpdb->update(
             FAND_COMMERCANTS_FOURNISSEURS_TABLE,
             [
-                'adresse'   => sanitize_text_field($data['adresse'] ?? ''),
-                'cp'        => sanitize_text_field($data['cp'] ?? ''),
-                'ville'     => sanitize_text_field($data['ville'] ?? ''),
-                'pays'      => sanitize_text_field($data['pays'] ?? ''),
-                'telephone' => sanitize_text_field($data['telephone'] ?? ''),
+                'adresse'          => sanitize_text_field($data['adresse'] ?? ''),
+                'cp'               => sanitize_text_field($data['cp'] ?? ''),
+                'ville'            => sanitize_text_field($data['ville'] ?? ''),
+                'pays'             => sanitize_text_field($data['pays'] ?? ''),
+                'telephone'        => sanitize_text_field($data['telephone'] ?? ''),
                 'note_personnelle' => sanitize_textarea_field($data['note_personnelle'] ?? '')
             ],
             ['commercant_id' => $commercant_id, 'fournisseur_id' => $fournisseur_id]
         );
 
-        // 3. VÉRIFICATION ET RÉPARATION DU TERM (Attribut WC)
-        // On cherche d'abord le terme avec le nouveau nom
-        $term = term_exists($nom_nouveau, FAND_FOURNISSEURS_ATTRIBUT);
+        // 2. Slug unique basé sur l'ID SQL (évite les conflits de casse ou noms similaires)
+        $term_slug = 'fournisseur-' . $fournisseur_id;
 
-        if (!$term && $fournisseur_actuel) {
-            // Si le terme n'existe pas sous le nouveau nom, on cherche l'ancien (cas d'un renommage)
-            $term = term_exists($fournisseur_actuel->nom, FAND_FOURNISSEURS_ATTRIBUT);
-        }
+        // 3. Chercher le terme par slug (fiable) puis mettre à jour ou recréer
+        $term_obj = get_term_by('slug', $term_slug, FAND_FOURNISSEURS_ATTRIBUT);
 
-        if ($term) {
-            // Le terme existe : on le met à jour (nom + slug) au cas où
-            $term_id = is_array($term) ? $term['term_id'] : $term;
-            wp_update_term($term_id, FAND_FOURNISSEURS_ATTRIBUT, [
+        if ($term_obj) {
+            // Le terme existe : on met à jour le nom affiché mais on garde le slug fixe
+            wp_update_term($term_obj->term_id, FAND_FOURNISSEURS_ATTRIBUT, [
                 'name' => $nom_nouveau,
-                'slug' => sanitize_title($nom_nouveau)
+                'slug' => $term_slug
             ]);
+            $term_id = $term_obj->term_id;
         } else {
-            // LE TERME A ÉTÉ SUPPRIMÉ : on le recrée de zéro
-            // Ta fonction add_term_attribut va créer le terme et remplir FAND_COMMERCANTS_TERMS
-            $term_id = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom_nouveau, $commercant_id);
+            // Terme introuvable par slug : on le recrée
+            $term_id = FAND_Attribut::add_term_attribut(
+                FAND_FOURNISSEURS_ATTRIBUT,
+                $nom_nouveau,
+                $commercant_id,
+                $term_slug
+            );
         }
 
-        // 4. Sécurité finale pour la table de liaison (Table 3)
-        // Si le term_id n'a pas été traité par add_term_attribut au dessus
-        if (isset($term_id) && $term_id) {
+        // 4. Sécurité finale : s'assurer que la liaison Table 3 est à jour
+        if (!empty($term_id)) {
             $wpdb->replace(
                 FAND_COMMERCANTS_TERMS,
                 [
@@ -327,46 +235,11 @@ class Database {
         }
 
         return [
-            'message' => __('Provider updated successfully!', 'split-email-providers'),
+            'message'      => __('Provider updated successfully!', 'split-email-providers'),
             'message_type' => 'success'
         ];
     }
-
-    /*static function get_all_fournisseurs() {
-        global $wpdb;
-
-        $table_fournisseurs = FAND_FOURNISSEURS_TABLE;
-
-        // Marketplace inactive
-        if (!defined('FAND_MARKET_ACTIVE') || !FAND_MARKET_ACTIVE) {
-            $results = $wpdb->get_results("SELECT * FROM $table_fournisseurs");
-            return $results;
-        }
-
-        // Marketplace active
-        $user_id = get_current_user_id();
-        $user    = get_userdata($user_id);
-        $table_relations    = FAND_COMMERCANTS_FOURNISSEURS_TABLE;
-        // User est vendeur → récupérer uniquement SES fournisseurs
-        $query = $wpdb->prepare("
-            SELECT f.*, 
-                r.adresse   AS adresse,
-                r.cp        AS cp,
-                r.ville     AS ville,
-                r.pays      AS pays,
-                r.telephone AS telephone,
-                r.note_personnelle
-            FROM $table_fournisseurs f
-            INNER JOIN $table_relations r 
-                ON f.id = r.fournisseur_id
-            WHERE r.commercant_id = %d
-        ", $user_id);
-
-        $results = $wpdb->get_results($query);
-        return $results;
-
-    }*/
-
+    
     static function get_all_fournisseurs() {
         global $wpdb;
 

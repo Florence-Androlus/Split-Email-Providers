@@ -36,7 +36,7 @@
                                             <!--button id="import" class="btn btn-secondary form-group tooltip-wrapper" data-bs-toggle="tooltip"  :title="translate('You need to upgrade to the PRO version.')"> {{ translate('Import') }} </!--button-->
                                             <button 
                                                 id="import" 
-                                                class="btn btn-secondary" 
+                                                :class="['btn', isProActive ? 'btn-primary' : 'btn-secondary']" 
                                                 @click="triggerFileInput"  :disabled="!isProActive"
                                                 data-bs-toggle="tooltip" 
                                                 :title="!isProActive ? translate('You need to upgrade to the PRO version.') : ''"> 
@@ -54,7 +54,7 @@
                                             <!--button--  id="export" class="btn btn-secondary form-group tooltip-wrapper" data-bs-toggle="tooltip"  :title="translate('You need to upgrade to the PRO version.')"> {{ translate('Export') }} </!--button-->
                                             <button 
                                                 id="export" 
-                                                class="btn btn-secondary" 
+                                                :class="['btn', isProActive ? 'btn-primary' : 'btn-secondary']" 
                                                 @click="exportCSV"
                                                 :disabled="!isProActive"
                                                 data-bs-toggle="tooltip" 
@@ -147,8 +147,8 @@ export default {
   },
   data() {
     return {
-      userLang: FandProData.locale || 'fr_FR',
-      translations: window.FandProData.translations.locale_data.messages, // Accéder à la structure imbriquée
+      userLang: FandData.locale || 'fr_FR',
+      translations: window.FandData.translations.locale_data.messages, // Accéder à la structure imbriquée
       fournisseurs: [], // Tableau pour stocker les fournisseurs
       currentPage: 1, // Page actuelle
       itemsPerPage: 10, // Nombre d'éléments par page
@@ -157,7 +157,7 @@ export default {
       showModal: false, // Contrôle de la visibilité de la modal
       selectedFournisseur: null, // Fournisseur sélectionné pour modification ou vue
       modalMode: "add", // "view" ou "edit"
-      isProActive: window.FandProData.licenceStatus
+      isProActive: window.FandData.licenceStatus
     };
   },
   computed: {
@@ -331,7 +331,7 @@ export default {
             
             // ICI : On ajoute le nonce qui manque !
             // On utilise la clé 'import_fournisseurs_nonce' car c'est ce que ton PHP cherche
-            formData.append('import_fournisseurs_nonce', window.FandProData.import_nonce); 
+            formData.append('import_fournisseurs_nonce', window.FandData.import_nonce); 
 
             fetch(ajax_url, {
                 method: 'POST',

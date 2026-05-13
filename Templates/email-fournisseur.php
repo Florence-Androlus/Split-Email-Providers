@@ -1,102 +1,104 @@
 <?php
 // Construction du corps de l'email avec un bandeau, logo, et informations de la boutique
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-	$email_body = '
-	<html>
-		<body>
+    $email_body = '
+    <html>
+        <body>
 
-			<div style="background-color:#f0f0f0; padding:20px; text-align:center;">
+            <div style="background-color:#f0f0f0; padding:20px; text-align:center;">
 
-				<img src="' . esc_url($shop_logo_url) . '" alt="Logo" style="max-width: 150px; max-height: 80px; width: auto; height: auto; display: inline-block;" />
+                <img src="' . esc_url($shop_logo_url) . '" alt="Logo" style="max-width: 150px; max-height: 80px; width: auto; height: auto; display: inline-block;" />
 
-			</div>
+            </div>
 
-			<div style="padding:20px; display: flex; justify-content: space-between; align-items: flex-start;">
-			<div>
+            <div style="padding:20px; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
 
-				<p><strong>Coordonnées de la boutique :</strong></p>
+                <p><strong>' . esc_html__('Shop details:', 'split-email-providers') . '</strong></p>
 
-				<p>' . esc_html($shop_name) . '<br>' . esc_html($shop_address) . '<br><strong>Ref :</strong> ' . esc_html($order->get_order_number()) . '</p>
+                <p>' . esc_html($shop_name) . '<br>' . esc_html($shop_address) . '<br><strong>' . esc_html__('Ref:', 'split-email-providers') . '</strong> ' . esc_html($order->get_order_number()) . '</p>
 
-			</div>
+            </div>
 
-			<div style="text-align: right;">
+            <div style="text-align: right;">
 
-				<p><strong>Date :</strong> ' . date_i18n('j F Y', strtotime($order->get_date_created())) . '</p>
+                <p><strong>' . esc_html__('Date:', 'split-email-providers') . '</strong> ' . date_i18n('j F Y', strtotime($order->get_date_created())) . '</p>
 
-			</div>
+            </div>
 
-			</div>
+            </div>
 
-			<div style="padding:20px;">
+            <div style="padding:20px;">
 
-				<p>Bonjour ' . esc_html($nom_fournisseur) . ', vous avez une nouvelle commande avec les produits suivants :</p>
+                <p>' . sprintf(
+                    esc_html__('Hello %s, you have a new order with the following products:', 'split-email-providers'),
+                    esc_html($nom_fournisseur)
+                ) . '</p>
 
-				<table border="1" cellpadding="10" cellspacing="0" style="border-collapse:collapse; width:100%;">
+                <table border="1" cellpadding="10" cellspacing="0" style="border-collapse:collapse; width:100%;">
 
-					<thead>
+                    <thead>
 
-						<tr>
+                        <tr>
 
-							<th>Nom du produit</th>
+                            <th>' . esc_html__('Product name', 'split-email-providers') . '</th>
 
-							<th>Quantité</th>
+                            <th>' . esc_html__('Quantity', 'split-email-providers') . '</th>
 
-							<th>Code GTIN/EAN</th>';
-						//error_log($show_price_column);
-						if ($show_price_column==1) {
-							$email_body .= '<th>Prix</th>';
-						}
-							
-							$email_body .= '</tr>
+                            <th>' . esc_html__('GTIN/EAN code', 'split-email-providers') . '</th>';
 
-					</thead>
+                        if ($show_price_column == 1) {
+                            $email_body .= '<th>' . esc_html__('Price', 'split-email-providers') . '</th>';
+                        }
 
-					<tbody>';
+                        $email_body .= '</tr>
 
-			foreach ($produits as $produit) {
+                    </thead>
 
-				$email_body .= '
+                    <tbody>';
 
-				<tr>
+            foreach ($produits as $produit) {
 
-					<td>' . esc_html($produit['nom']) . '</td>
+                $email_body .= '
 
-					<td>' . intval($produit['quantite']) . '</td>
+                <tr>
 
-					<td>' . (!empty($produit['gtin']) ? esc_html($produit['gtin']) : 'N/A') . '</td>';
-				
-					if ($show_price_column==1) {
-						$email_body .= '<td>' . (!empty($produit['price']) ? esc_html($produit['price']) : 'N/A') . '</td>';
-					}
-			
-				$email_body .= '</tr>';
-			}
+                    <td>' . esc_html($produit['nom']) . '</td>
 
-			$email_body .= '
+                    <td>' . intval($produit['quantite']) . '</td>
 
-					</tbody>
+                    <td>' . (!empty($produit['gtin']) ? esc_html($produit['gtin']) : esc_html__('N/A', 'split-email-providers')) . '</td>';
 
-				</table>
+                    if ($show_price_column == 1) {
+                        $email_body .= '<td>' . (!empty($produit['price']) ? esc_html($produit['price']) : esc_html__('N/A', 'split-email-providers')) . '</td>';
+                    }
 
-				<br>';
+                $email_body .= '</tr>';
+            }
 
-				if ($send_shop_address==1) {
-					$email_body .= '<p><strong>Adresse de livraison :</strong><br>' . esc_html($shop_address) . '</p>';
-				}
-				else{
-					$email_body .= '<p><strong>Adresse de livraison :</strong><br>' . esc_html($shipping_address) . '</p>';
-				}
+            $email_body .= '
 
-				$email_body .= '<br>
+                    </tbody>
 
-				<p>Merci de traiter cette commande rapidement.</p>
+                </table>
 
-			</div>
+                <br>';
 
-		</body>
+                if ($send_shop_address == 1) {
+                    $email_body .= '<p><strong>' . esc_html__('Delivery address:', 'split-email-providers') . '</strong><br>' . wp_kses($shop_address, ['br' => []]) . '</p>';
+                } else {
+                    $email_body .= '<p><strong>' . esc_html__('Delivery address:', 'split-email-providers') . '</strong><br>' . wp_kses($shipping_address, ['br' => []]) . '</p>';
+                }
 
-	</html>';
+                $email_body .= '<br>
 
-	return $email_body;
+                <p>' . esc_html__('Thank you for processing this order quickly.', 'split-email-providers') . '</p>
+
+            </div>
+
+        </body>
+
+    </html>';
+
+echo $email_body;

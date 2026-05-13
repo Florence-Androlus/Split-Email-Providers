@@ -49,6 +49,7 @@ class FANDSettingsPage {
 		add_filter('doing_it_wrong_trigger_error', '__return_false');
 
 		add_action('plugins_loaded', [Database::class, 'register_hooks']);
+		add_action('init', [FAND_Attribut::class, 'add_new_taxo']);
 
     }
 
@@ -235,10 +236,29 @@ class FANDSettingsPage {
 	}
 
 	function envoyer_email_fournisseur_apres_paiement($order_id) {
+
 		global $wpdb;
 		$show_price_column = 0;
 		$send_shop_address = 0;
 		
+		// Détection de la langue
+		$current_locale = get_user_locale();
+		$json_path = FAND_PLUGIN_DIR . 'languages/split-email-providers-' . $current_locale . '.json';
+
+		if (file_exists($json_path)) {
+			$content = json_decode(file_get_contents($json_path), true);
+			$translations = $content['locale_data']['split-email-providers'] ?? [];
+
+			// On ajoute un filtre dynamique pour intercepter les appels de traduction
+			add_filter('gettext', function($translation, $text, $domain) use ($translations) {
+				if ($domain === 'split-email-providers' && isset($translations[$text])) {
+					// Dans ton JSON, la traduction est à l'index [1]
+					return is_array($translations[$text]) ? $translations[$text][1] : $translations[$text];
+				}
+				return $translation;
+			}, 10, 3);
+		}
+
 		// Options addon
 		if (defined('FAND_PRO_IMPORT_EXPORT_ENABLED') && FAND_PRO_IMPORT_EXPORT_ENABLED) {
 			$show_price_column = get_option('split_email_add_price');
@@ -400,7 +420,7 @@ class FANDSettingsPage {
 				$nom_fournisseur  = $fournisseur['nom'];
 
 				$fournisseur_email = $fournisseur['email'];
-				$email_subject     = "Nouvelle commande pour vos produits";
+				$email_subject = sprintf(__('New order for your products - %s', 'split-email-providers'),$order->get_order_number());
 			}
 
 			//error_log('DEBUG EMAIL: shop_logo_url=' . $shop_logo_url);
@@ -413,7 +433,9 @@ class FANDSettingsPage {
 			//error_log('DEBUG EMAIL: produits=' . print_r($produits, true));
 			
 			// Ensuite tu inclus ton template
-			$fand_email_body = include FAND_PLUGIN_DIR . 'Templates/email-fournisseur.php';
+			ob_start();
+			include FAND_PLUGIN_DIR . '/Templates/email-fournisseur.php';
+			$fand_email_body = ob_get_clean();
 
 			$headers = [
 				'Content-Type: text/html; charset=UTF-8',

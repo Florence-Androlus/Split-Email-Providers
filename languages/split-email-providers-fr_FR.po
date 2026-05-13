@@ -307,3 +307,68 @@ msgstr "Page"
 #: split-email-providers.php
 msgid "of"
 msgstr "sur"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Shop details:"
+msgstr "Coordonnées de la boutique :"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Ref:"
+msgstr "Ref :"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Date:"
+msgstr "Date :"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Hello %s, you have a new order with the following products:"
+msgstr "Bonjour %s, vous avez une nouvelle commande avec les produits suivants :"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Product name"
+msgstr "Nom du produit"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Quantity"
+msgstr "Quantité"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "GTIN/EAN code"
+msgstr "Code GTIN/EAN"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Price"
+msgstr "Prix"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "N/A"
+msgstr "N/A"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Delivery address:"
+msgstr "Adresse de livraison :"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Thank you for processing this order quickly."
+msgstr "Merci de traiter cette commande rapidement."
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "New order for your products - %s"
+msgstr "Nouvelle commande pour vos produits - %s"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "New order - %s → %s"
+msgstr "Nouvelle commande - %s → %s"

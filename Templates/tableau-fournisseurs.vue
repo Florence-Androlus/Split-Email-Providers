@@ -68,6 +68,17 @@
 
                             <div class="div_saut_ligne" style="height:50px;"></div>
 
+                            <div class="alphabet-filter" style="margin-bottom: 15px; text-align: center;">
+                                <button 
+                                    v-for="letter in alphabet" 
+                                    :key="letter"
+                                    @click="filterByLetter(letter)"
+                                    :class="['btn btn-sm', selectedLetter === letter ? 'btn-primary' : 'btn-outline-secondary']"
+                                    style="margin: 2px;">
+                                    {{ letter }}
+                                </button>
+                            </div>
+
                             <table class="table table-hover" v-if="fournisseurs.length > 0">
                               <thead>
                                   <tr>
@@ -142,166 +153,180 @@
 import ModalFournisseur from './modal-fournisseur.vue';
 
 export default {
-  components: {
-    ModalFournisseur
-  },
-  data() {
-    return {
-      userLang: FandData.locale || 'fr_FR',
-      translations: window.FandData.translations.locale_data.messages, // Accéder à la structure imbriquée
-      fournisseurs: [], // Tableau pour stocker les fournisseurs
-      currentPage: 1, // Page actuelle
-      itemsPerPage: 10, // Nombre d'éléments par page
-      errorMessage: '', // Message d'erreur en cas de problème AJAX
-      alert: null, // Objet pour les alertes dynamiques { message: '', message_type: '' }
-      showModal: false, // Contrôle de la visibilité de la modal
-      selectedFournisseur: null, // Fournisseur sélectionné pour modification ou vue
-      modalMode: "add", // "view" ou "edit"
-      isProActive: window.FandData.licenceStatus
-    };
-  },
-  computed: {
-      // 1. On trie d'abord la liste complète
-      sortedFournisseurs() {
-          return [...this.fournisseurs].sort((a, b) => {
-              const nomA = a.nom ? a.nom.toLowerCase() : '';
-              const nomB = b.nom ? b.nom.toLowerCase() : '';
-              return nomA.localeCompare(nomB);
-          });
-      },
-      // 2. On calcule le nombre de pages sur la liste triée
-    totalPages() {
-          return Math.ceil(this.sortedFournisseurs.length / this.itemsPerPage);
+    components: {
+        ModalFournisseur
     },
-      // 3. On coupe la liste triée pour l'affichage
-    currentFournisseurs() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-          return this.sortedFournisseurs.slice(start, start + this.itemsPerPage);
-    }
-  },
-  created() {
-    // Lorsque le composant est créé, on charge les fournisseurs
-    this.fetchFournisseurs();
-  },
-  mounted() {
-    // console.log(traductionsVue.tableau_fournisseurs); // Cela doit afficher "Providers table" si la langue est en anglais
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
-    });
-  },
-  methods: {
-      translate(key) {
-        if (this.translations && this.translations[key]) {
-          return this.translations[key][1];
-        }
-        return key;
-      },
+    data() {
+        return {
+            userLang: FandData.locale || 'fr_FR',
+            translations: window.FandData.translations.locale_data['split-email-providers'], 
+            fournisseurs: [], // Tableau pour stocker les fournisseurs
+            currentPage: 1, // Page actuelle
+            itemsPerPage: 10, // Nombre d'éléments par page
+            errorMessage: '', // Message d'erreur en cas de problème AJAX
+            alert: null, // Objet pour les alertes dynamiques { message: '', message_type: '' }
+            showModal: false, // Contrôle de la visibilité de la modal
+            selectedFournisseur: null, // Fournisseur sélectionné pour modification ou vue
+            modalMode: "add", // "view" ou "edit"
+            isProActive: window.FandData.licenceStatus,
+            selectedLetter: 'All',
+            alphabet: ['All','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
+        };
+    },
+    computed: {
+        // 1. On trie d'abord la liste complète
+        sortedFournisseurs() {
+            return [...this.fournisseurs].sort((a, b) => {
+                const nomA = a.nom ? a.nom.toLowerCase() : '';
+                const nomB = b.nom ? b.nom.toLowerCase() : '';
+                return nomA.localeCompare(nomB);
+            });
+        },
 
-      // Fonction pour récupérer les fournisseurs via AJAX
-      fetchFournisseurs() {
+        filteredFournisseurs() {
+            if (this.selectedLetter === 'All') return this.sortedFournisseurs;
+            return this.sortedFournisseurs.filter(f =>
+                f.nom && f.nom.toUpperCase().startsWith(this.selectedLetter)
+            );
+        },
+
+        totalPages() {
+            return Math.ceil(this.filteredFournisseurs.length / this.itemsPerPage) || 1;
+        },
+
+        currentFournisseurs() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            return this.filteredFournisseurs.slice(start, start + this.itemsPerPage);
+        }
+    },
+    created() {
+        // Lorsque le composant est créé, on charge les fournisseurs
+        this.fetchFournisseurs();
+    },
+    mounted() {
+        // console.log(traductionsVue.tableau_fournisseurs); // Cela doit afficher "Providers table" si la langue est en anglais
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    },
+    methods: {
+        translate(key) {
+            if (this.translations && this.translations[key]) {
+                return this.translations[key][1];
+            }
+            return key;
+        },
+
+        filterByLetter(letter) {
+            this.selectedLetter = letter;
+            this.currentPage = 1;
+        },
+
+        // Fonction pour récupérer les fournisseurs via AJAX
+        fetchFournisseurs() {
         fetch(ajax_url + '?action=get_fournisseurs')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                      // Si data.data contient directement la liste
-                      this.fournisseurs = Array.isArray(data.data) ? data.data : []; 
-                      
-                      // Si le message est dans data.data.message
-                      if (data.data && data.data.message) {
-                          this.showAlert(data.data.message, data.data.message_type);
-                      }
+                        // Si data.data contient directement la liste
+                        this.fournisseurs = Array.isArray(data.data) ? data.data : []; 
+                        
+                        // Si le message est dans data.data.message
+                        if (data.data && data.data.message) {
+                            this.showAlert(data.data.message, data.data.message_type);
+                        }
                 }
             })
             .catch(error => {
                 console.error('Erreur AJAX:', error);
-                  this.fournisseurs = [];
+                    this.fournisseurs = [];
             });
-      },
+        },
 
-      showAlert(message, type = 'success') {
-          if (this.alertTimeout) {
-              clearTimeout(this.alertTimeout);
-          }
-          this.alert = { message, message_type: type };
-          this.alertTimeout = setTimeout(() => {
-              const alertElement = document.querySelector('.alert');
-              if (alertElement) alertElement.classList.add('alert-hidden');
-              setTimeout(() => {
-              this.alert = null;
-              }, 500); // Durée de l'animation
-          }, 4500);
-      },
+        showAlert(message, type = 'success') {
+            if (this.alertTimeout) {
+                clearTimeout(this.alertTimeout);
+            }
+            this.alert = { message, message_type: type };
+            this.alertTimeout = setTimeout(() => {
+                const alertElement = document.querySelector('.alert');
+                if (alertElement) alertElement.classList.add('alert-hidden');
+                setTimeout(() => {
+                this.alert = null;
+                }, 500); // Durée de l'animation
+            }, 4500);
+        },
 
-      // Fonction pour supprimer un fournisseur
-      deleteFournisseurs(fournisseur) {
+        // Fonction pour supprimer un fournisseur
+        deleteFournisseurs(fournisseur) {
             const confirmDelete = confirm(this.translate('Are you sure you want to remove this provider?'));
-          if (confirmDelete) {
-              fetch(ajax_url + '?action=delete_fournisseur', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ fournisseur_id: fournisseur.id }),
-              })
-              .then((response) => response.json())
-              .then((data) => {
-                  // Vérification si la réponse est réussie
-                  if (data.success) {
-                      // Rafraîchir les fournisseurs
-                      this.fetchFournisseurs();
-                      if (data.data.message && data.data.message_type) {
+            if (confirmDelete) {
+                fetch(ajax_url + '?action=delete_fournisseur', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fournisseur_id: fournisseur.id }),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    // Vérification si la réponse est réussie
+                    if (data.success) {
+                        // Rafraîchir les fournisseurs
+                        this.fetchFournisseurs();
+                        if (data.data.message && data.data.message_type) {
                     this.showAlert(data.data.message, data.data.message_type); // Afficher le message avec son type
                 }
-              }
+                }
             })
             .catch(error => {
                 console.error('Erreur AJAX:', error);
             });
-          }
-      },
+            }
+        },
 
-      openModal(fournisseur, mode) {
+        openModal(fournisseur, mode) {
         this.selectedFournisseur = { ...fournisseur };
         const shortLang = this.userLang.split('_')[1];
         if (mode === 'add') {
-          // Définir le pays par défaut ici, par exemple 'FR'
-          this.selectedFournisseur.pays = shortLang || 'FR';
+            // Définir le pays par défaut ici, par exemple 'FR'
+            this.selectedFournisseur.pays = shortLang || 'FR';
         }
         this.showModal = true;
         this.modalMode = mode;
-      },
+        },
 
-      closeModal() {
-          this.showModal = false;
-          this.selectedFournisseur = null;
-      },
+        closeModal() {
+            this.showModal = false;
+            this.selectedFournisseur = null;
+        },
 
-      saveFournisseur(updatedFournisseur,mode) {
-      fetch(ajax_url + '?action=save_fournisseur', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({fournisseur:updatedFournisseur,mode:mode}), // Envoyer les données mises à jour
-      })
-      .then((response) => response.json())
-      .then((data) => {
-          if (data.success) {
+        saveFournisseur(updatedFournisseur,mode) {
+        fetch(ajax_url + '?action=save_fournisseur', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({fournisseur:updatedFournisseur,mode:mode}), // Envoyer les données mises à jour
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
             if (data.data.message && data.data.message_type) {
                 this.showAlert(data.data.message, data.data.message_type); // Afficher le message avec son type
             }
             this.fetchFournisseurs(); // Rafraîchir la liste
             this.closeModal(); // Fermer la modal
-          }
-      })
-      .catch((error) => {
-          this.showAlert('Erreur AJAX : ' + error.message, 'error');
-      });
-      },
+            }
+        })
+        .catch((error) => {
+            this.showAlert('Erreur AJAX : ' + error.message, 'error');
+        });
+        },
 
-      changePage(page) {
+        changePage(page) {
         if (page > 0 && page <= this.totalPages) {
-          this.currentPage = page;
-          }
+            this.currentPage = page;
+            }
         },
 
         exportCSV() {
@@ -359,6 +384,34 @@ export default {
 </script>
 
 <style scoped>
+button {
+    border: none;
+    color: #fff;  /* ← force tout en blanc */
+    font-weight: bold;
+}
+
+.alphabet-filter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 15px;
+}
+
+.alphabet-filter button {
+    min-width: 32px;
+    padding: 2px 6px;
+    font-size: 12px;
+    color: #6c757d;        /* ← couleur sombre pour outline */
+    font-weight: normal;
+    border: 1px solid #6c757d;
+    flex-shrink: 0;
+}
+
+.alphabet-filter button.btn-primary {
+    color: #fff;           /* ← blanc uniquement quand actif */
+    border-color: #0d6efd;
+}
 
 .pagination {
 justify-content: center

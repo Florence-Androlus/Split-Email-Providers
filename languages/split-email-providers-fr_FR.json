@@ -1,8 +1,8 @@
-{"domain":"messages"
+{"domain":"split-email-providers"
 ,"locale_data":{
-    "messages":{
+    "split-email-providers":{
         "":{
-            "domain":"messages",
+            "domain":"split-email-providers",
             "plural_forms":"nplurals=2; plural=n > 1;","lang":"fr_FR"},
             "Split Email Providers":[null,"Split Email Providers"],
             "Managing email communications to Providers":[null,"Gestion des envois d'emails aux fournisseurs"],
@@ -64,6 +64,19 @@
             "Next":[null,"Suivant"],
             "Page":[null,"Page"],
             "of":[null,"sur"],
+            "Shop details:":[null,"Coordonnées de la boutique :"],
+            "Ref:":[null,"Ref :"],
+            "Date:":[null,"Date :"],
+            "Hello %s, you have a new order with the following products:":[null,"Bonjour %s, vous avez une nouvelle commande avec les produits suivants :"],
+            "Product name":[null,"Nom du produit"],
+            "Quantity":[null,"Quantité"],
+            "GTIN/EAN code":[null,"Code GTIN/EAN"],
+            "Price":[null,"Prix"],
+            "N/A":[null,"N/A"],
+            "Delivery address:":[null,"Adresse de livraison :"],
+            "Thank you for processing this order quickly.":[null,"Merci de traiter cette commande rapidement."],
+            "New order for your products - %s":[null,"Nouvelle commande pour vos produits - %s"],
+            "New order - %s → %s":[null,"Nouvelle commande - %s → %s"],
             "Importing providers":[null,"Importation de Fournisseurs"],
             "Importing...":[null,"Importation..."],
             "Veuillez sélectionner un fichier CSV.":[null,"Veuillez sélectionner un fichier CSV."],

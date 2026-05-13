@@ -22,6 +22,19 @@ class FAND_Attribut {
             return wc_create_attribute($attribut);
 
         }
+        else {
+            // Mettre à jour le nom si la langue a changé
+            $attribute = wc_get_attribute(wc_attribute_taxonomy_id_by_name('fournisseur'));
+            if ($attribute && $attribute->name !== __('Provider', 'split-email-providers')) {
+                wc_update_attribute($attribute->id, [
+                    'name'         => __('Provider', 'split-email-providers'),
+                    'slug'         => 'fournisseur',
+                    'type'         => 'select',
+                    'order_by'     => 'menu_order',
+                    'has_archives' => false,
+                ]);
+            }
+        }
     }
 
     // Fonction pour ajouter un terme à un attribut

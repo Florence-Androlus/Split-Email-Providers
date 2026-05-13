@@ -310,7 +310,68 @@ msgstr ""
 msgid "of"
 msgstr ""
 
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Shop details:"
+msgstr ""
 
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Ref:"
+msgstr ""
 
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Date:"
+msgstr ""
 
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Hello %s, you have a new order with the following products:"
+msgstr ""
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Product name"
+msgstr ""
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Quantity"
+msgstr ""
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "GTIN/EAN code"
+msgstr ""
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Price"
+msgstr ""
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "N/A"
+msgstr ""
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Delivery address:"
+msgstr ""
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Thank you for processing this order quickly."
+msgstr ""
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "New order for your products - %s"
+msgstr ""
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "New order - %s → %s"
+msgstr ""
 

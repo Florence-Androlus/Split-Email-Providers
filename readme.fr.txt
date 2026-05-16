@@ -1,10 +1,10 @@
 === Split Email Providers ===
 Donate link: https://fan-develop.fr  
 Tags: WooCommerce, fournisseur, email, gestion fournisseurs  
-Requires at least: 6.8  
-Tested up to: 6.9  
-Requires PHP: 8.2  
-Stable tag: 1.1.5 
+Requires at least: 6.8
+Tested up to: 7.0
+Requires PHP: 8.2
+Stable tag: 1.1.6 
 Requires Plugins: woocommerce
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
@@ -92,6 +92,9 @@ Non, La personnalisation avancée arrive très bientôt dans la version Pro.
 9. **Email au fournisseur** – 📨 Exemple d’email automatique envoyé à un fournisseur avec les produits concernés par une commande.
 
 == Changelog ==
+
+= 1.1.6 =
+Compatible avec WordPress 7.0
 
 = 1.1.5 =
 Ajout compatibilité split email provider market pour wcfm anglais d’origine

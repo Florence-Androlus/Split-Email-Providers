@@ -80,47 +80,7 @@ class Database {
         // car on veut garder les coordonnées SQL même si l'attribut produit est supprimé.
     }
 
-    /*static function add_fournisseur($data) {
-        global $wpdb;
-        $user_id = get_current_user_id() ?: 1;
-        $email = sanitize_email($data['email'] ?? '');
-        $nom   = sanitize_text_field($data['nom'] ?? '');
-
-        if (empty($nom)) return ['message' => 'Nom vide', 'message_type' => 'error'];
-
-        // 1. Table 1 : Identité
-        $f_id = $wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM " . FAND_FOURNISSEURS_TABLE . " WHERE email = %s",
-            $email
-        ));
-
-        if (!$f_id) {
-            $wpdb->insert(FAND_FOURNISSEURS_TABLE, ['nom' => $nom, 'email' => $email]);
-            $f_id = $wpdb->insert_id;
-        }
-
-        // 2. Table 2 : Coordonnées (On utilise l'ID fournisseur pour lier)
-        $wpdb->replace(FAND_COMMERCANTS_FOURNISSEURS_TABLE, [
-            'commercant_id'  => $user_id,
-            'fournisseur_id' => $f_id,
-            'adresse'        => sanitize_text_field($data['adresse'] ?? ''),
-            'cp'             => sanitize_text_field($data['cp'] ?? ''),
-            'ville'          => sanitize_text_field($data['ville'] ?? ''),
-            'pays'           => sanitize_text_field($data['pays'] ?? ''),
-            'telephone'      => sanitize_text_field($data['telephone'] ?? ''),
-            'note_personnelle' => sanitize_textarea_field($data['note_personnelle'] ?? '')
-        ]);
-
-        // 3. Table 3 : Liaison Terms (C'est ici qu'on sécurise)
-        // On crée/récupère le term_id via ta classe FAND_Attribut
-        $term_slug = 'fournisseur-' . $f_id;
-        $term_id = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $user_id, $term_slug);
-
-        return [
-            'message' => __('Provider added successfully!', 'split-email-providers'), 
-            'message_type' => 'success'
-        ];
-    }*/
+    /* ok en free mais pas en market
     static function add_fournisseur($data) {
         global $wpdb;
         $user_id = get_current_user_id() ?: 1;
@@ -159,6 +119,62 @@ class Database {
         ]);
 
         // 4. Table 3 : Liaison Terms
+        $term_slug = 'fournisseur-' . $f_id;
+        $term_id   = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $user_id, $term_slug);
+
+        return [
+            'message'      => __('Provider added successfully!', 'split-email-providers'),
+            'message_type' => 'success'
+        ];
+    }*/
+    static function add_fournisseur($data) {
+        global $wpdb;
+        $user_id = get_current_user_id() ?: 1;
+        $email = sanitize_email($data['email'] ?? '');
+        $nom   = sanitize_text_field($data['nom'] ?? '');
+
+        if (empty($nom)) return ['message' => 'Nom vide', 'message_type' => 'error'];
+
+        // 1. Vérifier si l'email existe globalement
+        $f_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM " . FAND_FOURNISSEURS_TABLE . " WHERE email = %s",
+            $email
+        ));
+
+        if ($f_id) {
+            // Email existe — vérifier si ce commerçant l'a déjà
+            $already_linked = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM " . FAND_COMMERCANTS_FOURNISSEURS_TABLE . "
+                WHERE commercant_id = %d AND fournisseur_id = %d",
+                $user_id, $f_id
+            ));
+
+            if ($already_linked) {
+                return [
+                    'message'      => __('A provider with this email already exists.', 'split-email-providers'),
+                    'message_type' => 'error'
+                ];
+            }
+            // Fournisseur global existe mais pas lié à ce commerçant → on lie
+        } else {
+            // N'existe pas globalement → on crée
+            $wpdb->insert(FAND_FOURNISSEURS_TABLE, ['nom' => $nom, 'email' => $email]);
+            $f_id = $wpdb->insert_id;
+        }
+
+        // 2. Table 2 : Coordonnées spécifiques à ce commerçant
+        $wpdb->insert(FAND_COMMERCANTS_FOURNISSEURS_TABLE, [
+            'commercant_id'    => $user_id,
+            'fournisseur_id'   => $f_id,
+            'adresse'          => sanitize_text_field($data['adresse'] ?? ''),
+            'cp'               => sanitize_text_field($data['cp'] ?? ''),
+            'ville'            => sanitize_text_field($data['ville'] ?? ''),
+            'pays'             => sanitize_text_field($data['pays'] ?? ''),
+            'telephone'        => sanitize_text_field($data['telephone'] ?? ''),
+            'note_personnelle' => sanitize_textarea_field($data['note_personnelle'] ?? '')
+        ]);
+
+        // 3. Table 3 : Liaison Terms
         $term_slug = 'fournisseur-' . $f_id;
         $term_id   = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $user_id, $term_slug);
 

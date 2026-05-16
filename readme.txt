@@ -2,9 +2,9 @@
 Donate link: https://fan-develop.fr
 Tags: WooCommerce, supplier, email, supplier management
 Requires at least: 6.8
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.1.5
+Stable tag: 1.1.6
 Requires Plugins: woocommerce
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -110,6 +110,9 @@ Custom settings – ⚙️ Customization options to adapt the addon to your stor
 Supplier email – 📨 Example of an automatic email sent to a supplier with the products involved in an order.
 
 == Changelog ==
+
+= 1.1.6 =
+Compatible with WordPress 7.0
 
 = 1.1.5 =
 Added split email provider market compatibility for WCFM anglais d’origine

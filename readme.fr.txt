@@ -1,4 +1,5 @@
 === Split Email Providers ===
+Contributors: fandevelop
 Donate link: https://fan-develop.fr  
 Tags: WooCommerce, fournisseur, email, gestion fournisseurs  
 Requires at least: 6.8
@@ -94,19 +95,19 @@ Non, La personnalisation avancée arrive très bientôt dans la version Pro.
 == Changelog ==
 
 = 1.1.6 =
-Compatible avec WordPress 7.0
+* Correction de bugs mineurs
 
 = 1.1.5 =
-Ajout compatibilité split email provider market pour wcfm anglais d’origine
+* Compatible avec WordPress 7.0
 
 = 1.1.4 =
-Compatible avec WordPress 6.9
+* Compatible avec WordPress 6.9
 
 = 1.1.3 =
-Ajout compatibilité split email provider market pour wcfm
+* Ajout compatibilité split email provider market pour wcfm
 
 = 1.1.2 =
-Requires Plugins: woocommerce
+* Requires Plugins: woocommerce
 
 = 1.1.1 =
 * Modification du readme

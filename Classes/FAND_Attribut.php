@@ -1,12 +1,17 @@
 <?php
 
 namespace fand\Classes;
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FAND_Attribut {
 
     // Fonction pour ajouter un nouvel attribut de produit
-    static public function add_new_taxo()
-    {
+    static public function add_new_taxo(){
+        // Vérifier que WooCommerce est chargé
+        /*if (!function_exists('wc_create_attribute')) {
+            return;
+        }*/
+
         if (!taxonomy_exists(FAND_FOURNISSEURS_ATTRIBUT)) {
 
             // Nom de l'attribut
@@ -64,6 +69,7 @@ class FAND_Attribut {
         }
 
         if ($commercant_id !== null) {
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $wpdb->replace(FAND_COMMERCANTS_TERMS, [
                 'commercant_id' => (int)$commercant_id,
                 'term_id'       => (int)$term_id,
@@ -72,61 +78,8 @@ class FAND_Attribut {
         }
 
         return $term_id;
+        // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
     }
-    /*static function add_term_attribut($taxonomy, $term, $commercant_id = null) {
-        
-        global $wpdb;
-        //error_log('taxonomy :' . $taxonomy);
-        //error_log('term :' . $term);
-        //error_log('commercant_id :' . $commercant_id);
-
-        // Vérifier si le terme existe déjà
-        $term_check = term_exists($term, $taxonomy);
-        
-        if (!$term_check) {
-            $insert_result = wp_insert_term($term, $taxonomy);
-
-            if (is_wp_error($insert_result)) {
-                //error_log('Erreur wp_insert_term : ' . $insert_result->get_error_message());
-                return null; // ou false selon ta logique
-            }
-
-            $term_id = $insert_result['term_id'];
-        } else {
-            // $term_check peut être int ou array selon contexte
-            $term_id = is_array($term_check) ? $term_check['term_id'] : $term_check;
-        }
-
-        //error_log('term_id :' . $term_id);
-
-        // Utilisation de REPLACE pour la Table 3 : plus propre et évite les doublons
-        if ($commercant_id !== null) {
-            $wpdb->replace(FAND_COMMERCANTS_TERMS, [
-                'commercant_id' => (int)$commercant_id,
-                'term_id'       => (int)$term_id,
-                'date_created'  => current_time('mysql')
-            ]);
-        }
-        /*if ($commercant_id !== null && defined('FAND_COMMERCANTS_TERMS')) {
-        
-            $exists = $wpdb->get_var($wpdb->prepare(
-                "SELECT id FROM " . FAND_COMMERCANTS_TERMS . " WHERE commercant_id = %d AND term_id = %d",
-                $commercant_id,
-                $term_id
-            ));
-
-            if (!$exists) {
-                $wpdb->insert(FAND_COMMERCANTS_TERMS, [
-                    'commercant_id' => (int)$commercant_id,
-                    'term_id'       => (int)$term_id,
-                    'date_created'  => current_time('mysql')
-                ]);
-            }
-        }*/
-
-    /*    return $term_id;
-    }*/
-
 
     // Fonction pour mettre à jour un terme dans l'attribut
     static function update_term_attribut($slug, $term, $new_term_data) {

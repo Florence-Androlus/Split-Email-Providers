@@ -1,8 +1,9 @@
 <?php
 
 namespace fand\Classes\Database;
-
 use fand\Classes\FAND_Attribut;
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Database {
 
@@ -70,7 +71,7 @@ class Database {
         if ($taxonomy !== FAND_FOURNISSEURS_ATTRIBUT) {
             return;
         }
-
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         // Supprimer la liaison dans ta table 3
         $wpdb->delete(FAND_COMMERCANTS_TERMS, [
             'term_id' => $term_id
@@ -136,16 +137,19 @@ class Database {
         if (empty($nom)) return ['message' => 'Nom vide', 'message_type' => 'error'];
 
         // 1. Vérifier si l'email existe globalement
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $f_id = $wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM " . FAND_FOURNISSEURS_TABLE . " WHERE email = %s",
+            "SELECT id FROM %i WHERE email = %s",
+            FAND_FOURNISSEURS_TABLE,
             $email
         ));
 
         if ($f_id) {
             // Email existe — vérifier si ce commerçant l'a déjà
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $already_linked = $wpdb->get_var($wpdb->prepare(
-                "SELECT id FROM " . FAND_COMMERCANTS_FOURNISSEURS_TABLE . "
-                WHERE commercant_id = %d AND fournisseur_id = %d",
+                "SELECT id FROM %i WHERE commercant_id = %d AND fournisseur_id = %d",
+                FAND_COMMERCANTS_FOURNISSEURS_TABLE,
                 $user_id, $f_id
             ));
 
@@ -158,11 +162,13 @@ class Database {
             // Fournisseur global existe mais pas lié à ce commerçant → on lie
         } else {
             // N'existe pas globalement → on crée
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $wpdb->insert(FAND_FOURNISSEURS_TABLE, ['nom' => $nom, 'email' => $email]);
             $f_id = $wpdb->insert_id;
         }
 
         // 2. Table 2 : Coordonnées spécifiques à ce commerçant
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->insert(FAND_COMMERCANTS_FOURNISSEURS_TABLE, [
             'commercant_id'    => $user_id,
             'fournisseur_id'   => $f_id,
@@ -177,7 +183,8 @@ class Database {
         // 3. Table 3 : Liaison Terms
         $term_slug = 'fournisseur-' . $f_id;
         $term_id   = FAND_Attribut::add_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $nom, $user_id, $term_slug);
-
+        
+        wp_cache_delete('fand_fournisseurs_' . $user_id, 'fand');
         return [
             'message'      => __('Provider added successfully!', 'split-email-providers'),
             'message_type' => 'success'
@@ -196,12 +203,13 @@ class Database {
         }
 
         // 1. Mise à jour des tables SQL (Identité et Coordonnées)
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->update(
             FAND_FOURNISSEURS_TABLE,
             ['nom' => $nom_nouveau, 'email' => sanitize_email($data['email'] ?? '')],
             ['id' => $fournisseur_id]
         );
-
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->update(
             FAND_COMMERCANTS_FOURNISSEURS_TABLE,
             [
@@ -223,6 +231,7 @@ class Database {
 
         if ($term_obj) {
             // Le terme existe : on met à jour le nom affiché mais on garde le slug fixe
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             wp_update_term($term_obj->term_id, FAND_FOURNISSEURS_ATTRIBUT, [
                 'name' => $nom_nouveau,
                 'slug' => $term_slug
@@ -230,6 +239,7 @@ class Database {
             $term_id = $term_obj->term_id;
         } else {
             // Terme introuvable par slug : on le recrée
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $term_id = FAND_Attribut::add_term_attribut(
                 FAND_FOURNISSEURS_ATTRIBUT,
                 $nom_nouveau,
@@ -240,6 +250,7 @@ class Database {
 
         // 4. Sécurité finale : s'assurer que la liaison Table 3 est à jour
         if (!empty($term_id)) {
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $wpdb->replace(
                 FAND_COMMERCANTS_TERMS,
                 [
@@ -258,30 +269,30 @@ class Database {
     
     static function get_all_fournisseurs() {
         global $wpdb;
+        $user_id   = get_current_user_id();
+        $cache_key = 'fand_fournisseurs_' . $user_id;
+        $cached    = wp_cache_get($cache_key, 'fand');
 
-        $table_f = FAND_FOURNISSEURS_TABLE;
-        $table_rel = FAND_COMMERCANTS_FOURNISSEURS_TABLE;
-        $user_id = get_current_user_id();
-
-        // On ne fait plus de distinction Free/Market pour la requête de base
-        // car tes données d'adresses sont dépendantes du commercant_id quoi qu'il arrive.
+        if ($cached !== false) {
+            return $cached;
+        }
         
-        // INNER JOIN : On ne récupère que les fournisseurs qui ont une liaison
-        // avec le commerçant actuel (WHERE r.commercant_id = %d)
-        $query = $wpdb->prepare("
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $results = $wpdb->get_results($wpdb->prepare("
             SELECT f.id, f.nom, f.email,
                 r.adresse, r.cp, r.ville, r.pays, r.telephone, r.note_personnelle
-            FROM $table_f f
-            INNER JOIN $table_rel r ON f.id = r.fournisseur_id
+            FROM %i f
+            INNER JOIN %i r ON f.id = r.fournisseur_id
             WHERE r.commercant_id = %d
-        ", $user_id);
+        ", FAND_FOURNISSEURS_TABLE, FAND_COMMERCANTS_FOURNISSEURS_TABLE, $user_id));
 
-        return $wpdb->get_results($query);
+        wp_cache_set($cache_key, $results, 'fand', 300);
+        return $results;
     }
 
     static function delete_fournisseur($POST) {
         global $wpdb;
-
+        $user_id   = get_current_user_id();
         // 1. Récupération de l'ID
         $fournisseur_id = 0;
         if (isset($POST['fournisseur_id'])) {
@@ -301,11 +312,13 @@ class Database {
 
         // 2. Récupérer le nom pour trouver le Term AVANT suppression
         $fournisseur_nom = $wpdb->get_var($wpdb->prepare(
-            "SELECT nom FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id = %d", 
+            "SELECT nom FROM %i WHERE id = %d",
+            FAND_FOURNISSEURS_TABLE,
             $fournisseur_id
         ));
 
         // 3. Supprimer les coordonnées spécifiques du commerçant (Table 2)
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->delete(FAND_COMMERCANTS_FOURNISSEURS_TABLE, [
             'commercant_id'  => $commercant_id,
             'fournisseur_id' => $fournisseur_id
@@ -317,23 +330,28 @@ class Database {
             
             if ($term) {
                 // Supprimer la liaison Commerçant <-> Term (Table 3)
+                // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                 $wpdb->delete(FAND_COMMERCANTS_TERMS, [
                     'commercant_id' => $commercant_id,
                     'term_id'       => $term->term_id
                 ]);
 
                 // 5. NETTOYAGE GLOBAL : Si plus aucun commerçant n'utilise ce fournisseur
+                // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                 $still_used = $wpdb->get_var($wpdb->prepare(
-                    "SELECT COUNT(*) FROM " . FAND_COMMERCANTS_FOURNISSEURS_TABLE . " WHERE fournisseur_id = %d",
+                    "SELECT COUNT(*) FROM %i WHERE fournisseur_id = %d",
+                    FAND_COMMERCANTS_FOURNISSEURS_TABLE,
                     $fournisseur_id
                 ));
 
                 if (intval($still_used) === 0) {
                     // A. Supprimer le fournisseur de la table globale (Table 1)
+                    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                     $wpdb->delete(FAND_FOURNISSEURS_TABLE, ['id' => $fournisseur_id]);
                     
                     // B. Supprimer le terme de la taxonomie WooCommerce (pa_fournisseur)
                     // Cela retire le terme de la liste des attributs produits
+                    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                     wp_delete_term($term->term_id, FAND_FOURNISSEURS_ATTRIBUT);
                     
                     // C. Optionnel : Nettoyer le cache des transiants de WooCommerce 
@@ -343,163 +361,11 @@ class Database {
             }
         }
 
+        wp_cache_delete('fand_fournisseurs_' . $user_id, 'fand');
         return [
             'message' => __('Provider deleted successfully.', 'split-email-providers'),
             'message_type' => 'success'
         ];
     }
-
-    /*static function delete_fournisseur($POST){
-        global $wpdb;
-
-        $message = '';
-        $message_type = '';
-
-        // 1. Récupération ID fournisseur
-        if (isset($POST['fournisseur'])) {
-            $fournisseur = $POST['fournisseur'];
-            $fournisseur_id = FAND_MARKET_ACTIVE
-                ? (isset($fournisseur['fournisseur_id']) ? intval($fournisseur['fournisseur_id']) : 0)
-                : (isset($fournisseur['id']) ? intval($fournisseur['id']) : 0);
-            //error_log('Fournisseur reçu : ' . print_r($fournisseur, true));
-        } elseif (isset($POST['fournisseur_id'])) {
-            $fournisseur_id = intval($POST['fournisseur_id']);
-            //error_log("Fournisseur reçu directement avec fournisseur_id = $fournisseur_id");
-        } else {
-            //error_log('Aucun fournisseur trouvé dans POST : ' . print_r($POST, true));
-            return ['message' => __('Invalid provider.', 'split-email-providers'), 'message_type' => __('error', 'split-email-providers')];
-        }
-
-        //error_log("Tentative suppression fournisseur ID: $fournisseur_id");
-
-        if (!$fournisseur_id) {
-            return ['message' => __('Invalid provider.', 'split-email-providers'), 'message_type' => __('error', 'split-email-providers')];
-        }
-
-        if (FAND_MARKET_ACTIVE) {
-            $commercant_id = get_current_user_id();
-            //error_log("ℹ Commerçant courant : $commercant_id");
-            // Récupérer nom avant suppression
-            $fournisseur_data = $wpdb->get_row(
-                $wpdb->prepare("SELECT id, nom FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id=%d", $fournisseur_id),
-                ARRAY_A
-            );
-            //error_log("ℹ Données fournisseur avant suppression : " . print_r($fournisseur_data, true));
-            $fournisseur_nom = $fournisseur_data['nom'];
-
-            // Récupérer le terme global du fournisseur
-            $term = get_term_by('name', $fournisseur_nom, FAND_FOURNISSEURS_ATTRIBUT);
-
-            if ($term) {
-                $term_id = intval($term->term_id);
-                //error_log("ℹ Term_id à supprimer pour ce commerçant : $term_id");
-
-                // Supprimer la relation uniquement pour ce commerçant
-                $deleted_term_rel = $wpdb->delete(
-                    FAND_COMMERCANTS_TERMS,
-                    [
-                        'commercant_id' => $commercant_id,
-                        'term_id'       => $term_id
-                    ]
-                );
-                //error_log(" Suppression relation commercant=$commercant_id ↔ term_id=$term_id : " . ($deleted_term_rel ? "OK" : "ECHEC"));
-            } else {
-                //error_log("Aucun terme trouvé pour '$fournisseur_nom'");
-            }
-
-            // 2. Supprimer relation commercant ↔ fournisseur
-            $deleted_rel = $wpdb->delete(
-                FAND_COMMERCANTS_FOURNISSEURS_TABLE,
-                [
-                    'commercant_id'  => $commercant_id,
-                    'fournisseur_id' => $fournisseur_id
-                ]
-            );
-            //error_log(" Suppression relation commercant-fournisseur : " . ($deleted_rel ? "OK" : "ECHEC"));
-
-            // 4. Vérifier relations restantes
-            $relations = $wpdb->get_var(
-                $wpdb->prepare(
-                    "SELECT COUNT(*) FROM " . FAND_COMMERCANTS_FOURNISSEURS_TABLE . " WHERE fournisseur_id=%d",
-                    $fournisseur_id
-                )
-            );
-            //error_log(" Nombre de relations restantes pour ce fournisseur : $relations");
-
-            if (!$relations) {
-                // Récupérer nom avant suppression
-                $fournisseur_data = $wpdb->get_row(
-                    $wpdb->prepare("SELECT id, nom FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id=%d", $fournisseur_id),
-                    ARRAY_A
-                );
-               // error_log(" Données fournisseur avant suppression : " . print_r($fournisseur_data, true));
-
-                if ($fournisseur_data) {
-                    $fournisseur_nom = $fournisseur_data['nom'];
-
-                    // Supprimer fournisseur global
-                    $deleted_fourn = $wpdb->delete(FAND_FOURNISSEURS_TABLE, ['id' => $fournisseur_id]);
-                    //error_log("Fournisseur global supprimé : " . ($deleted_fourn ? "OK" : "ECHEC"));
-
-                    // Supprimer toutes les relations term restantes
-                    $deleted_term_all = $wpdb->delete(
-                        FAND_COMMERCANTS_TERMS,
-                        ['term_id' => $fournisseur_id]
-                    );
-                    //error_log(" Relations restantes dans FAND_COMMERCANTS_TERMS supprimées : " . ($deleted_term_all ? "OK" : "ECHEC"));
-
-                    // Supprimer terme global
-                    $term = get_term_by('name', $fournisseur_nom, FAND_FOURNISSEURS_ATTRIBUT);
-                    if ($term) {
-                        $result_delete_term = wp_delete_term($term->term_id, FAND_FOURNISSEURS_ATTRIBUT);
-                        //error_log(" Suppression terme global : " . ($result_delete_term && !is_wp_error($result_delete_term) ? "OK" : "ECHEC"));
-                    } else {
-                        //error_log(" Aucun terme global trouvé pour '$fournisseur_nom'");
-                    }
-                }
-            }
-
-            
-            return [__('Provider deleted successfully.', 'split-email-providers'),__('success', 'split-email-providers')];
-
-        } else {
-            // Suppression d'un fournisseur
-            $fournisseur_id = intval($POST['fournisseur_id']); // Récupérer l'ID du fournisseur à supprimer
-
-            // Récupérer le fournisseur pour obtenir le nom du term
-            $fournisseur = $wpdb->get_row($wpdb->prepare("SELECT nom FROM %i WHERE id = %d",FAND_FOURNISSEURS_TABLE, $fournisseur_id));
-
-            if ($fournisseur) {
-                // Supprimer le term associé
-                $term_name = $fournisseur->nom; // Nom du term à supprimer
-
-                // Appeler la fonction pour supprimer le term
-                $result = FAND_Attribut::delete_term_attribut(FAND_FOURNISSEURS_ATTRIBUT, $term_name);
-                if (is_wp_error($result)) {
-                    $message = __('Error deleting term: ', 'split-email-providers') . $result->get_error_message();
-                    $message_type = __('error', 'split-email-providers'); // Indicateur d'erreur
-                } 
-                else {
-                    $message = __('Term deleted successfully.', 'split-email-providers');
-                    $message_type = __('success', 'split-email-providers'); // Indicateur de succès
-                }
-            }
-
-            // Supprimer le fournisseur de la base de données
-            $deleted = $wpdb->delete(FAND_FOURNISSEURS_TABLE, array('id' => $fournisseur_id));
-
-            if ($deleted) {
-                $message = __('Provider deleted successfully.', 'split-email-providers');
-                $message_type = __('success', 'split-email-providers'); // Indicateur de succès
-            } 
-            else {
-                $message = __('Error deleting provider.', 'split-email-providers');
-                $message_type = __('error', 'split-email-providers'); // Indicateur d'erreur
-            }
-
-            return ['message'=>$message,'message_type'=>$message_type];
-        }
- 
-    }*/
-
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }

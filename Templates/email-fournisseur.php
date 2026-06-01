@@ -2,7 +2,14 @@
 // Construction du corps de l'email avec un bandeau, logo, et informations de la boutique
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-    $email_body = '
+    // translators: %s = nom du fournisseur
+    $fand_hello_text = sprintf(
+        // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+        esc_html__('Hello %s, you have a new order with the following products:', 'split-email-providers'),
+        esc_html($nom_fournisseur)
+    );
+
+    $fand_fournisseur_email_content = '
     <html>
         <body>
 
@@ -30,54 +37,43 @@ if ( ! defined( 'ABSPATH' ) ) exit;
             </div>
 
             <div style="padding:20px;">
-
-                <p>' . sprintf(
-                    esc_html__('Hello %s, you have a new order with the following products:', 'split-email-providers'),
-                    esc_html($nom_fournisseur)
-                ) . '</p>
+                <p>' . $fand_hello_text . '</p>
 
                 <table border="1" cellpadding="10" cellspacing="0" style="border-collapse:collapse; width:100%;">
 
                     <thead>
 
                         <tr>
-
                             <th>' . esc_html__('Product name', 'split-email-providers') . '</th>
-
                             <th>' . esc_html__('Quantity', 'split-email-providers') . '</th>
-
                             <th>' . esc_html__('GTIN/EAN code', 'split-email-providers') . '</th>';
-
                         if ($show_price_column == 1) {
-                            $email_body .= '<th>' . esc_html__('Price', 'split-email-providers') . '</th>';
+                            $fand_fournisseur_email_content .= '<th>' . esc_html__('Price', 'split-email-providers') . '</th>';
                         }
-
-                        $email_body .= '</tr>
-
+                        $fand_fournisseur_email_content .= '</tr>
                     </thead>
-
                     <tbody>';
 
-            foreach ($produits as $produit) {
+                    foreach ($produits as $fand_produit ) {
 
-                $email_body .= '
+                        $fand_fournisseur_email_content .= '
 
-                <tr>
+                        <tr>
 
-                    <td>' . esc_html($produit['nom']) . '</td>
+                            <td>' . esc_html($fand_produit ['nom']) . '</td>
 
-                    <td>' . intval($produit['quantite']) . '</td>
+                            <td>' . intval($fand_produit ['quantite']) . '</td>
 
-                    <td>' . (!empty($produit['gtin']) ? esc_html($produit['gtin']) : esc_html__('N/A', 'split-email-providers')) . '</td>';
+                            <td>' . (!empty($fand_produit['gtin']) ? esc_html($fand_produit['gtin']) : esc_html__('N/A', 'split-email-providers')) . '</td>';
 
-                    if ($show_price_column == 1) {
-                        $email_body .= '<td>' . (!empty($produit['price']) ? esc_html($produit['price']) : esc_html__('N/A', 'split-email-providers')) . '</td>';
+                            if ($show_price_column == 1) {
+                                $fand_fournisseur_email_content .= '<td>' . (!empty($fand_produit['price']) ? esc_html($fand_produit['price']) : esc_html__('N/A', 'split-email-providers')) . '</td>';
+                            }
+
+                        $fand_fournisseur_email_content .= '</tr>';
                     }
 
-                $email_body .= '</tr>';
-            }
-
-            $email_body .= '
+                    $fand_fournisseur_email_content .= '
 
                     </tbody>
 
@@ -86,12 +82,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                 <br>';
 
                 if ($send_shop_address == 1) {
-                    $email_body .= '<p><strong>' . esc_html__('Delivery address:', 'split-email-providers') . '</strong><br>' . wp_kses($shop_address, ['br' => []]) . '</p>';
+                    $fand_fournisseur_email_content .= '<p><strong>' . esc_html__('Delivery address:', 'split-email-providers') . '</strong><br>' . wp_kses($shop_address, ['br' => []]) . '</p>';
                 } else {
-                    $email_body .= '<p><strong>' . esc_html__('Delivery address:', 'split-email-providers') . '</strong><br>' . wp_kses($shipping_address, ['br' => []]) . '</p>';
+                    $fand_fournisseur_email_content .= '<p><strong>' . esc_html__('Delivery address:', 'split-email-providers') . '</strong><br>' . wp_kses($shipping_address, ['br' => []]) . '</p>';
                 }
 
-                $email_body .= '<br>
+                $fand_fournisseur_email_content .= '<br>
 
                 <p>' . esc_html__('Thank you for processing this order quickly.', 'split-email-providers') . '</p>
 
@@ -101,4 +97,4 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
     </html>';
 
-echo $email_body;
+echo wp_kses_post($fand_fournisseur_email_content);

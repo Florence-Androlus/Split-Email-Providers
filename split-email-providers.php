@@ -3,7 +3,7 @@
 * Description:         Managing email communications to Providers 
 * Version:             1.1.6
 * Requires at least:   6.8
-* Tested up to:        6.9  
+* Tested up to:        7.0  
 * Requires PHP:        8.2
 * Requires Plugins:    woocommerce
 * Author:              Fan-Develop
@@ -44,22 +44,11 @@ define('FAND_VERSION', '1.1.6');
 define('FAND_MAIN_FILE', __FILE__);
 define('FAND_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FAND_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('FAND_PRO_PLUGIN', 'split-email-providers-pro/split-email-providers-pro.php');
-define('FAND_MARKET_PLUGIN', 'split-email-providers-market/split-email-providers-market.php');
-
-// Vérification si la version Pro est active
-if (is_plugin_active(FAND_PRO_PLUGIN)) {
-    define('FAND_PRO_ACTIVE', true);
-} else {
-    define('FAND_PRO_ACTIVE', false);
-}
 
 // Vérification si la version MARKET est active
 if (!defined('FAND_MARKET_ACTIVE')) {
     define('FAND_MARKET_ACTIVE', false);
 }
-
-//error_log('FAND_MARKET_ACTIVE :' .FAND_MARKET_ACTIVE);
 
 // Défini la table des fournisseurs
 global $wpdb;

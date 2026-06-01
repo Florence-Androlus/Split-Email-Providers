@@ -32,17 +32,17 @@
                                                 {{ translate('Add')}}
                                             </button>
                                         </div>
-                                        <div>
+                                        <!--div-->
                                             <!--button id="import" class="btn btn-secondary form-group tooltip-wrapper" data-bs-toggle="tooltip"  :title="translate('You need to upgrade to the PRO version.')"> {{ translate('Import') }} </!--button-->
-                                            <button 
+                                            <!--button 
                                                 id="import" 
                                                 :class="['btn', isProActive ? 'btn-primary' : 'btn-secondary']" 
                                                 @click="triggerFileInput"  :disabled="!isProActive"
                                                 data-bs-toggle="tooltip" 
                                                 :title="!isProActive ? translate('You need to upgrade to the PRO version.') : ''"> 
                                                 {{ translate('Import') }} 
-                                            </button>
-                                        </div>
+                                            </!--button>
+                                        </!--div>
                                         <input 
                                             type="file" 
                                             ref="fileInput" 
@@ -50,9 +50,9 @@
                                             accept=".csv" 
                                             @change="handleFileUpload"
                                         >
-                                        <div>
+                                        <div-->
                                             <!--button--  id="export" class="btn btn-secondary form-group tooltip-wrapper" data-bs-toggle="tooltip"  :title="translate('You need to upgrade to the PRO version.')"> {{ translate('Export') }} </!--button-->
-                                            <button 
+                                            <!--button 
                                                 id="export" 
                                                 :class="['btn', isProActive ? 'btn-primary' : 'btn-secondary']" 
                                                 @click="exportCSV"
@@ -60,8 +60,29 @@
                                                 data-bs-toggle="tooltip" 
                                                 :title="!isProActive ? translate('You need to upgrade to the PRO version.') : ''"> 
                                                 {{ translate('Export') }} 
+                                            </!--button>
+                                        </div-->    
+                                        <div>
+                                            <button 
+                                                id="import"
+                                                class="btn btn-secondary"
+                                                @click="goToPro"
+                                                data-bs-toggle="tooltip" 
+                                                :title="translate('You need to upgrade to the PRO version.')"> 
+                                                {{ translate('Import') }} 
                                             </button>
-                                        </div>                   
+                                        </div>
+
+                                        <div>
+                                            <button 
+                                                id="export"
+                                                class="btn btn-secondary"
+                                                @click="goToPro"
+                                                data-bs-toggle="tooltip" 
+                                                :title="translate('You need to upgrade to the PRO version.')"> 
+                                                {{ translate('Export') }} 
+                                            </button>
+                                        </div>                                  
                                     </div>
                                 </div>	
                             </div>
@@ -168,7 +189,7 @@ export default {
             showModal: false, // Contrôle de la visibilité de la modal
             selectedFournisseur: null, // Fournisseur sélectionné pour modification ou vue
             modalMode: "add", // "view" ou "edit"
-            isProActive: window.FandData.licenceStatus,
+            // isProActive: window.FandData.licenceStatus,
             selectedLetter: 'All',
             alphabet: ['All','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
         };
@@ -209,8 +230,17 @@ export default {
         tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
         });
+
+        // Écouter l'événement de refresh du plugin PRO
+        document.addEventListener('fandsep_refresh_fournisseurs', () => {
+            this.fetchFournisseurs();
+        });
     },
     methods: {
+        goToPro() {
+            window.open('https://fan-develop.fr/addon-woocommerce-gestion-fournisseurs/', '_blank');
+        },
+
         translate(key) {
             if (this.translations && this.translations[key]) {
                 return this.translations[key][1];
@@ -225,7 +255,7 @@ export default {
 
         // Fonction pour récupérer les fournisseurs via AJAX
         fetchFournisseurs() {
-        fetch(ajax_url + '?action=get_fournisseurs')
+        fetch(ajax_url + '?action=fandsep_get_fournisseurs')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -262,9 +292,9 @@ export default {
         deleteFournisseurs(fournisseur) {
             const confirmDelete = confirm(this.translate('Are you sure you want to remove this provider?'));
             if (confirmDelete) {
-                fetch(ajax_url + '?action=delete_fournisseur', {
+                fetch(ajax_url + '?action=fandsep_delete_fournisseur&nonce=' + window.FandData.nonce, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ fournisseur_id: fournisseur.id }),
                 })
                 .then((response) => response.json())
@@ -301,12 +331,10 @@ export default {
         },
 
         saveFournisseur(updatedFournisseur,mode) {
-        fetch(ajax_url + '?action=save_fournisseur', {
+        fetch(ajax_url + '?action=fandsep_save_fournisseur&nonce=' + window.FandData.nonce, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({fournisseur:updatedFournisseur,mode:mode}), // Envoyer les données mises à jour
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fournisseur: updatedFournisseur, mode: mode }),
         })
         .then((response) => response.json())
         .then((data) => {
@@ -329,12 +357,12 @@ export default {
             }
         },
 
-        exportCSV() {
+        /*exportCSV() {
             if (!this.isProActive) return;
 
             // Pour un export, on peut simplement ouvrir l'URL AJAX dans un nouvel onglet
             // car l'action AJAX va forcer le téléchargement du fichier CSV
-            const exportUrl = ajax_url + '?action=export_fournisseurs';
+            const exportUrl = ajax_url + '?action=sep_export_fournisseurs';
             window.location.href = exportUrl;
         },
 
@@ -378,7 +406,7 @@ export default {
                 console.error('Erreur:', error);
                 this.showAlert('Erreur lors de la connexion au serveur', 'error');
             });
-        },
+        },*/
     }
 }
 </script>

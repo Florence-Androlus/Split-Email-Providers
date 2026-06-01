@@ -4,7 +4,7 @@ namespace fand;
 
 use fand\Classes\FAND_Attribut;
 use fand\Classes\Database\Database;
-use fandmarket\FANDSettingsPageMarket;
+//use fandmarket\FANDSettingsPageMarket;
 
 defined('ABSPATH') || exit;
 
@@ -25,17 +25,16 @@ class FANDSettingsPage {
 		add_action('woocommerce_order_status_processing', [$this,'envoyer_email_fournisseur_manuel']);
 
 		//requette AJAX pour récupérer les fournisseurs
-		add_action('wp_ajax_get_fournisseurs', [$this,'get_fournisseurs_callback']); // Pour les utilisateurs connectés
-		add_action('wp_ajax_nopriv_get_fournisseurs', [$this,'get_fournisseurs_callback']); // Pour les utilisateurs non connectés
+		add_action('wp_ajax_fandsep_get_fournisseurs', [$this,'get_fournisseurs_callback']); // Pour les utilisateurs connectés
+		add_action('wp_ajax_nopriv_fandsep_get_fournisseurs', [$this,'get_fournisseurs_callback']); // Pour les utilisateurs non connectés
         //requette AJAX pour supprimer un fournisseur
-		add_action('wp_ajax_delete_fournisseur', [$this,'delete_fournisseur_callback']);
-		add_action('wp_ajax_nopriv_delete_fournisseur', [$this,'delete_fournisseur_callback']);
+		add_action('wp_ajax_fandsep_delete_fournisseur', [$this,'delete_fournisseur_callback']);
+		
 		//requette AJAX pour récupérer la liste des pays
-		add_action('wp_ajax_get_countries', [$this,'get_countries_ajax']);
-		add_action('wp_ajax_nopriv_get_countries', [$this,'get_countries_ajax']);
+		add_action('wp_ajax_fandsep_get_countries', [$this,'get_countries_ajax']);
+		add_action('wp_ajax_nopriv_fandsep_get_countries', [$this,'get_countries_ajax']);
 		//requette AJAX pour sauvegarder un fournisseur
-		add_action('wp_ajax_save_fournisseur', [$this,'save_fournisseur_ajax']);
-		add_action('wp_ajax_nopriv_save_fournisseur', [$this,'save_fournisseur_ajax']);
+		add_action('wp_ajax_fandsep_save_fournisseur', [$this,'save_fournisseur_ajax']);
 
 		// Fix pour l'erreur WooCommerce Subscriptions
         add_action('plugins_loaded', function() {
@@ -62,7 +61,7 @@ class FANDSettingsPage {
 	}
 
 	static function get_fournisseurs_callback() {
-        // Récupérer toutes les fournisseurs via la fonction Database::get_all_fournisseurs()
+		// Récupérer toutes les fournisseurs via la fonction Database::get_all_fournisseurs()
         $fournisseurs = Database::get_all_fournisseurs();
 		//error_log("Fournisseurs récupérés : " . print_r($fournisseurs, true));
         // Retourner les fournisseurs sous forme de JSON pour Vue.js
@@ -72,8 +71,19 @@ class FANDSettingsPage {
     }
 
 	static function delete_fournisseur_callback() {
-        // Récupérer les données envoyées via POST
-        $data = json_decode(file_get_contents('php://input'), true);
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error(['message' => __('Unauthorized.', 'split-email-providers')]);
+			wp_die();
+		}
+
+		// Vérification nonce via GET
+		if (!isset($_GET['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'sep_nonce')) {
+			wp_send_json_error(['message' => __('Security check failed.', 'split-email-providers')]);
+			wp_die();
+		}
+
+		$raw = file_get_contents('php://input');
+		$data = json_decode($raw, true);
 		
         if (isset($data['fournisseur_id'])) {
             // Effectuez la suppression du fournisseur en fonction de la clé
@@ -101,7 +111,21 @@ class FANDSettingsPage {
 
 	// Fonction AJAX pour sauvegarder un fournisseur
 	static function save_fournisseur_ajax() {
-        $data = json_decode(file_get_contents('php://input'), true);
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error(['message' => __('Unauthorized.', 'split-email-providers')]);
+			wp_die();
+		}
+
+		// Vérification nonce via GET
+		if (!isset($_GET['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'sep_nonce')) {
+			wp_send_json_error(['message' => __('Security check failed.', 'split-email-providers')]);
+			wp_die();
+		}
+
+		$raw = file_get_contents('php://input');
+		$data = json_decode($raw, true);
+		// error_log("Données reçues pour save_fournisseur_ajax : " . print_r($data, true));
+        
 		//error_log(print_r($data['fournisseur'], true));
 		if (isset($data['fournisseur'])) {
 			if ($data['mode']==='add'){
@@ -153,11 +177,11 @@ class FANDSettingsPage {
 			// Enqueue des styles CSS
 			wp_enqueue_style('bootstrap',FAND_PLUGIN_URL . 'assets/css/bootstrap.min.css',array(),FAND_VERSION);
 			wp_enqueue_style('font-awesome',FAND_PLUGIN_URL . 'assets/css/all.min.css',array(),FAND_VERSION);
-			wp_enqueue_style('custom-style',FAND_PLUGIN_URL . 'assets/css/style.css',array(),FAND_VERSION);
+			wp_enqueue_style('custom-fandsep-style',FAND_PLUGIN_URL . 'assets/css/style.css',array(),FAND_VERSION);
 
 			// Enqueue des scripts JavaScript
 			wp_enqueue_script('jquery'); // Charge jQuery en priorité
-			wp_enqueue_script('custom-script',FAND_PLUGIN_URL . 'assets/js/script.js',array('jquery'),FAND_VERSION,true);
+			wp_enqueue_script('custom-fandsep-script',FAND_PLUGIN_URL . 'assets/js/script.js',array('jquery'),FAND_VERSION,true);
 			wp_enqueue_script('bootstrap',FAND_PLUGIN_URL . 'assets/js/bootstrap.bundle.min.js',array('jquery'),FAND_VERSION,true);
 			wp_enqueue_script('vue-app', FAND_PLUGIN_URL . 'dist/tableauFournisseurs.js', array('jquery'), FAND_VERSION, true);
 		}
@@ -187,12 +211,20 @@ class FANDSettingsPage {
 			}
 		}
 
-		$data_to_pass = [
+		/*$data_to_pass = [
 			'ajax_url'      => admin_url('admin-ajax.php'),
 			'locale'        => $current_locale,
 			'translations'  => $translations, 
 			'licenceStatus' => defined('FAND_PRO_IMPORT_EXPORT_ENABLED') && FAND_PRO_IMPORT_EXPORT_ENABLED,
 			'import_nonce'  => wp_create_nonce('import_fournisseurs_action'),
+			'nonce'        => wp_create_nonce('sep_nonce'),
+		];*/
+
+		$data_to_pass = [
+			'ajax_url'     => admin_url('admin-ajax.php'),
+			'locale'       => $current_locale,
+			'translations' => $translations,
+			'nonce'        => wp_create_nonce('sep_nonce'),
 		];
 	
 		// Passer les données à Vue.js
@@ -205,11 +237,6 @@ class FANDSettingsPage {
 
 	// Render the settings page.
 	public function render_tableau_fournisseurs_page(){
-
-		// Vérification du nonce
-		if (isset($_GET['_wpnonce']) && !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'fournisseur_action')) {
-			wp_die(esc_html__('Security check failed.', 'split-email-providers'));
-		}
 
 		echo '<div style="display: none;">';
 			echo '<a href="https://fan-develop.fr/Split-email-providers/">Création de plugin custom php MySQL Javasript Gestion des envois d\'emails aux fournisseurs.</a>';
@@ -238,8 +265,6 @@ class FANDSettingsPage {
 	function envoyer_email_fournisseur_apres_paiement($order_id) {
 
 		global $wpdb;
-		$show_price_column = 0;
-		$send_shop_address = 0;
 		
 		// Détection de la langue
 		$current_locale = get_user_locale();
@@ -259,23 +284,21 @@ class FANDSettingsPage {
 			}, 10, 3);
 		}
 
-		// Options addon
-		if (defined('FAND_PRO_IMPORT_EXPORT_ENABLED') && FAND_PRO_IMPORT_EXPORT_ENABLED) {
-			$show_price_column = get_option('split_email_add_price');
-			$send_shop_address = get_option('split_email_send_shop_address');
-		} 
-
+		// Options addon - géré par le plugin PRO via hook
+		$show_price_column = apply_filters('fandsep_show_price_column', 0);
+		$send_shop_address = apply_filters('fandsep_send_shop_address', 0);
+	
 		// Récupération commande
 		$order = wc_get_order($order_id);
 		if (!$order) {
-			error_log("[SplitEmail] Commande introuvable pour ID $order_id");
+			//error_log("[SplitEmail] Commande introuvable pour ID $order_id");
 			return;
 		}
 
 		// Email admin
 		$admin_email = get_option('admin_email');
 		if (!$admin_email) {
-			error_log("[SplitEmail] Aucun email admin configuré");
+			//error_log("[SplitEmail] Aucun email admin configuré");
 			return;
 		}
 
@@ -297,7 +320,7 @@ class FANDSettingsPage {
 			$product      = wc_get_product($product_id);
 
 			if (!$product) {
-				error_log("[SplitEmail] Produit $product_id introuvable");
+				//error_log("[SplitEmail] Produit $product_id introuvable");
 				continue;
 			}
 
@@ -306,11 +329,10 @@ class FANDSettingsPage {
 			$price = $product->get_price();
 
 			// Mode marketplace activé
-			if (defined('FAND_MARKET_ACTIVE') && FAND_MARKET_ACTIVE) {
-				$info = FANDSettingsPageMarket::fand_get_vendor_and_supplier_info($product_id);
+			if (defined('FAND_MARKET_ACTIVE') && FAND_MARKET_ACTIVE && class_exists('fandmarket\FANDSettingsPageMarket')) {
+				$info = \fandmarket\FANDSettingsPageMarket::fand_get_vendor_and_supplier_info($product_id);
 
 				if (!$info || empty($info['fournisseur'])) {
-					error_log("[SplitEmail] Pas de fournisseur pour produit $product_id");
 					continue;
 				}
 
@@ -333,7 +355,7 @@ class FANDSettingsPage {
 					'price'    => $price
 				];
 
-				error_log("[SplitEmail] Ajout produit {$item->get_name()} ({$item->get_quantity()}) au couple Vendor={$vendor['nom']} / Fournisseur={$fournisseur['nom']}");
+				//error_log("[SplitEmail] Ajout produit {$item->get_name()} ({$item->get_quantity()}) au couple Vendor={$vendor['nom']} / Fournisseur={$fournisseur['nom']}");
 
 			} else {
 				// === Mode FREE (sans marketplace) ===
@@ -346,20 +368,24 @@ class FANDSettingsPage {
 					$fournisseur_id = intval(str_replace('fournisseur-', '', $fournisseur_term->slug));
 
 					if ($fournisseur_id) {
+						// phpcs:disable  WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 						$fournisseur_email_row = $wpdb->get_row($wpdb->prepare(
-							"SELECT email FROM " . FAND_FOURNISSEURS_TABLE . " WHERE id = %d",
+							"SELECT email FROM %i WHERE id = %d",
+							FAND_FOURNISSEURS_TABLE,
 							$fournisseur_id
 						));
 					} else {
 						// Fallback pour les anciens termes sans slug normalisé
+						// phpcs:disable  WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 						$fournisseur_email_row = $wpdb->get_row($wpdb->prepare(
-							"SELECT email FROM " . FAND_FOURNISSEURS_TABLE . " WHERE nom = %s",
+							"SELECT email FROM %i WHERE nom = %s",
+							FAND_FOURNISSEURS_TABLE,
 							$fournisseur_nom
 						));
 					}
 
 					if (!$fournisseur_email_row || empty($fournisseur_email_row->email)) {
-						error_log("[SplitEmail] Pas d'email fournisseur trouvé pour $fournisseur_nom");
+						//error_log("[SplitEmail] Pas d'email fournisseur trouvé pour $fournisseur_nom");
 						continue;
 					}
 
@@ -388,7 +414,7 @@ class FANDSettingsPage {
 		}
 
 		if (empty($groupes)) {
-			error_log("[SplitEmail] Aucun groupe (vendeur/fournisseur) à traiter pour commande $order_id");
+			//error_log("[SplitEmail] Aucun groupe (vendeur/fournisseur) à traiter pour commande $order_id");
 			return;
 		}
 
@@ -406,7 +432,9 @@ class FANDSettingsPage {
 				$nom_fournisseur  = $fournisseur['nom'];  // Nom du fournisseur
 
 				$fournisseur_email = $fournisseur['email'];
-				$email_subject     = "Nouvelle commande - {$vendeur['nom']} → {$fournisseur['nom']}";
+				// translators: %1$s = nom du vendeur, %2$s = nom du fournisseur
+				$subject_template = __('New order - %1$s → %2$s', 'split-email-providers');
+				$email_subject = sprintf($subject_template, $vendeur['nom'], $fournisseur['nom']);
 
 			} else {
 				// === Mode FREE ===
@@ -420,7 +448,12 @@ class FANDSettingsPage {
 				$nom_fournisseur  = $fournisseur['nom'];
 
 				$fournisseur_email = $fournisseur['email'];
-				$email_subject = sprintf(__('New order for your products - %s', 'split-email-providers'),$order->get_order_number());
+
+				$email_subject = sprintf(
+					// translators: %s = numéro de commande
+					__('New order for your products - %s', 'split-email-providers'),
+					$order->get_order_number()
+				);
 			}
 
 			//error_log('DEBUG EMAIL: shop_logo_url=' . $shop_logo_url);
@@ -449,5 +482,5 @@ class FANDSettingsPage {
 			//error_log("Envoi à {$nom_fournisseur} ({$fournisseur_email}) : " . ($sent ? 'OK' : 'ECHEC'));
 		}
 	}
-
+// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }

@@ -1,17 +1,23 @@
 <?php
 
 namespace fand\Classes;
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class FAND_Attribut {
 
-    static public function add_nouvel_attribut($nom_attribut,$attribut_slug)
-    {
-        if (!taxonomy_exists($attribut_slug)) {
+    // Fonction pour ajouter un nouvel attribut de produit
+    static public function add_new_taxo(){
+        // Vérifier que WooCommerce est chargé
+        /*if (!function_exists('wc_create_attribute')) {
+            return;
+        }*/
+
+        if (!taxonomy_exists(FAND_FOURNISSEURS_ATTRIBUT)) {
 
             // Nom de l'attribut
             $attribut = array(
-                'slug' => $attribut_slug,
-                'name' => $nom_attribut,
+                'slug' => FAND_FOURNISSEURS_ATTRIBUT,
+                'name' => __('Provider', 'split-email-providers'),
                 'type' => 'select', // type de champ (select, radio, etc.)
                 'order_by' => 'menu_order', // tri des termes
                 'has_archives' => false,
@@ -21,22 +27,58 @@ class FAND_Attribut {
             return wc_create_attribute($attribut);
 
         }
+        else {
+            // Mettre à jour le nom si la langue a changé
+            $attribute = wc_get_attribute(wc_attribute_taxonomy_id_by_name('fournisseur'));
+            if ($attribute && $attribute->name !== __('Provider', 'split-email-providers')) {
+                wc_update_attribute($attribute->id, [
+                    'name'         => __('Provider', 'split-email-providers'),
+                    'slug'         => 'fournisseur',
+                    'type'         => 'select',
+                    'order_by'     => 'menu_order',
+                    'has_archives' => false,
+                ]);
+            }
+        }
     }
 
-    // Fonction pour ajouter des termes à l'attribut
-    static function add_term_attribut($slug,$term) {
+    // Fonction pour ajouter un terme à un attribut
+    static function add_term_attribut($taxonomy, $term, $commercant_id = null, $term_slug = null) {
+        
+        global $wpdb;
 
-        // Vérifier si le terme existe déjà
-        $term_id = term_exists($term, sanitize_title($slug));
-
-        $args=[
-            'description'=>$term,
-        ];
-
-        // Si le terme n'existe pas, l'ajouter
-        if ($term_id==null) {
-           return wp_insert_term($term, $slug,$args);
+        // Chercher par slug si fourni (plus fiable que le nom)
+        if ($term_slug) {
+            $term_check = get_term_by('slug', $term_slug, $taxonomy);
+            $term_check = $term_check ? ['term_id' => $term_check->term_id] : null;
+        } else {
+            $term_check = term_exists($term, $taxonomy);
         }
+        
+        if (!$term_check) {
+            $args = ['slug' => $term_slug ?? sanitize_title($term)];
+            $insert_result = wp_insert_term($term, $taxonomy, $args);
+
+            if (is_wp_error($insert_result)) {
+                return null;
+            }
+
+            $term_id = $insert_result['term_id'];
+        } else {
+            $term_id = is_array($term_check) ? $term_check['term_id'] : $term_check;
+        }
+
+        if ($commercant_id !== null) {
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $wpdb->replace(FAND_COMMERCANTS_TERMS, [
+                'commercant_id' => (int)$commercant_id,
+                'term_id'       => (int)$term_id,
+                'date_created'  => current_time('mysql')
+            ]);
+        }
+
+        return $term_id;
+        // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
     }
 
     // Fonction pour mettre à jour un terme dans l'attribut
@@ -79,20 +121,30 @@ class FAND_Attribut {
 
     // Fonction pour supprimer des termes de l'attribut
     static function delete_term_attribut($slug, $term) {
+        $taxonomy = sanitize_title($slug);
+
+        //error_log("Suppression terme dans taxonomie '$taxonomy' pour valeur : " . print_r($term, true));
+
         // Vérifier si le terme existe
-        $term_id = term_exists($term, sanitize_title($slug));
+        $term_id = term_exists($term, $taxonomy);
 
-        // Si le terme existe, le supprimer
-        if ($term_id) {
-            // Supprimer le terme de la taxonomie spécifiée
-            $result = wp_delete_term($term_id['term_id'], sanitize_title($slug));
+        if (!$term_id) {
+            //error_log("Aucun terme trouvé pour '$term' dans taxonomie '$taxonomy'");
+            return false;
+        }
 
-            // Vérifier si la suppression a échoué
-            if (is_wp_error($result)) {
-                return $result; // Retourner l'erreur si la suppression échoue
-            } else {
-                return true; // Retourner vrai si la suppression a réussi
-            }
-        } 
+        //error_log("Terme trouvé : ID=" . $term_id['term_id'] . " (taxonomy=$taxonomy)");
+
+        // Supprimer le terme de la taxonomie spécifiée
+        $result = wp_delete_term($term_id['term_id'], $taxonomy);
+
+        if (is_wp_error($result)) {
+            //error_log("Erreur suppression terme ID=" . $term_id['term_id'] . " : " . $result->get_error_message());
+            return $result; // Retourner l'erreur si la suppression échoue
+        } else {
+            //error_log("Terme ID=" . $term_id['term_id'] . " supprimé avec succès.");
+            return true; // Retourner vrai si la suppression a réussi
+        }
     }
+
 }

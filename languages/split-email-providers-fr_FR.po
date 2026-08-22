@@ -23,22 +23,15 @@ msgstr ""
 msgid "Split Email Providers"
 msgstr "Split Email Providers"
 
+#. Author URI of the plugin
+#. Plugin Name of the plugin
+#: split-email-providers.php
+msgid "Managing email communications to Providers"
+msgstr "Gestion des envois d'emails aux fournisseurs"
+
 #: plugin.php:86
-msgid "Échec de la vérification de sécurité."
+msgid "Security check failed."
 msgstr "Échec de la vérification de sécurité."
-
-#: Classes/Router.php:63
-msgid "Nonce non valide pour la suppression du fournisseur."
-msgstr "Nonce non valide pour la suppression du fournisseur."
-
-#: Classes/Router.php:56
-msgid "Nonce non valide pour la mise à jour du fournisseur."
-msgstr "Nonce non valide pour la mise à jour du fournisseur."
-
-#: Classes/Import_fournisseurs.php:20 Classes/Router.php:77
-#: Classes/Router.php:85
-msgid "Vérification nonce échouée. Action non autorisée."
-msgstr "Vérification nonce échouée. Action non autorisée."
 
 #. Author of the plugin
 #: split-email-providers.php
@@ -47,57 +40,57 @@ msgstr "Fan-Develop"
 
 #. Description of the plugin
 #: split-email-providers.php
-msgid "Gestion des envois d'emails aux fournisseurs"
+msgid "Managing email sending to suppliers"
 msgstr "Gestion des envois d'emails aux fournisseurs"
 
 #. Title plugins
 #: split-email-providers.php
-msgid "Tableau des fournisseurs"
+msgid "Providers table"
 msgstr "Tableau des fournisseurs"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Ajouter"
+msgid "Add"
 msgstr "Ajouter"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Importer"
+msgid "Import"
 msgstr "Importer"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Exporter"
+msgid "Export"
 msgstr "Exporter"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Vous devez passer à la version PRO."
+msgid "You need to upgrade to the PRO version."
 msgstr "Vous devez passer à la version PRO."
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Nom"
+msgid "Name"
 msgstr "Nom"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Adresse"
+msgid "Address"
 msgstr "Adresse"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "CP"
+msgid "Postcode"
 msgstr "Code Postal"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Ville"
+msgid "City"
 msgstr "Ville"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Pays"
+msgid "Country"
 msgstr "Pays"
 
 #. Description plugins
@@ -107,138 +100,202 @@ msgstr "Email"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Téléphone"
+msgid "Phone"
 msgstr "Téléphone"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Voir"
+msgid "View"
 msgstr "Voir"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Modifier"
+msgid "Edit"
 msgstr "Modifier"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Supprimer"
+msgid "Delete"
 msgstr "Supprimer"
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Aucun fournisseur disponible."
+msgid "No provider available."
 msgstr "Aucun fournisseur disponible."
 
 #. Description plugins
 #: split-email-providers.php
-msgid "Aucun fournisseur trouvé pour cette lettre."
+msgid "No provider found for this letter."
 msgstr "Aucun fournisseur trouvé pour cette lettre."
 
+#. Message plugins
+#: plugin.php
+msgid "Error during deletion."
+msgstr "Erreur lors de la suppression."
+
+#. Message plugins
+#: plugin.php
+msgid "Provider"
+msgstr "Fournisseur"
+
+#. Message plugins
+#: plugin.php
+msgid "Providers"
+msgstr "Fournisseurs"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Le fournisseur existe déjà."
+msgid "Key missing."
+msgstr "Clé de licence manquante."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Error adding or modifying"
+msgstr "Erreur lors de l\'ajout ou de la modification du fournisseur."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "The provider already exists."
 msgstr "Le fournisseur existe déjà."
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Fournisseur ajouté, mais erreur lors de l'ajout du term."
+msgid "Provider added, but error adding term."
 msgstr "Fournisseur ajouté, mais erreur lors de l'ajout du term."
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Fournisseur ajouté avec succès !"
+msgid "Provider added successfully!"
 msgstr "Fournisseur ajouté avec succès !"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Erreur lors de l'ajout du fournisseur."
+msgid "Error adding provider."
 msgstr "Erreur lors de l'ajout du fournisseur."
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Fournisseur mis à jour avec succès !"
+msgid "Provider updated successfully!"
 msgstr "Fournisseur mis à jour avec succès !"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Erreur lors de la mise à jour du fournisseur."
+msgid "Error updating provider."
 msgstr "Erreur lors de la mise à jour du fournisseur."
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Erreur lors de la suppression du term : "
+msgid "Error deleting term: "
 msgstr "Erreur lors de la suppression du term : "
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Term supprimé avec succès."
+msgid "Term deleted successfully."
 msgstr "Term supprimé avec succès."
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Fournisseur supprimé avec succès."
+msgid "Provider deleted successfully."
 msgstr "Fournisseur supprimé avec succès."
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Erreur lors de la suppression du fournisseur."
+msgid "Error deleting provider."
 msgstr "Erreur lors de la suppression du fournisseur."
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Fournisseur enregistré avec succès."
-msgstr "Fournisseur enregistré avec succès."
+msgid "Supplier associated, but error during attribute association."
+msgstr "Fournisseur associé, mais erreur lors de l'association attribut."
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Êtes-vous sûr de vouloir supprimer ce fournisseur ?"
+msgid "Supplier associated with your account."
+msgstr "Fournisseur associé à votre compte."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "This supplier is already associated with your account."
+msgstr "Ce fournisseur est déjà associé à votre compte."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Supplier created, but error during attribute association."
+msgstr "Fournisseur créé, mais erreur lors de l'association attribut."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Supplier created and associated with your account."
+msgstr "Fournisseur créé et associé à votre compte."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "invalid Provider."
+msgstr "Fournisseur invalide."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Are you sure you want to remove this provider?"
 msgstr "Êtes-vous sûr de vouloir supprimer ce fournisseur ?"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Ajouter un fournisseur"
+msgid "Add a provider"
 msgstr "Ajouter un fournisseur"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Modifier fournisseur"
+msgid "Change provider"
 msgstr "Modifier fournisseur"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Voir fournisseur"
+msgid "View provider"
 msgstr "Voir fournisseur"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Enregistrer"
+msgid "Save"
 msgstr "Enregistrer"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Veuillez remplir les champs obligatoires"
+msgid "Loading countries..."
+msgstr "Chargement des pays..."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Please fill in the required fields"
 msgstr "Veuillez remplir les champs obligatoires"
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Veuillez renseigner ce champ."
+msgid "Please fill in this field."
 msgstr "Veuillez renseigner ce champ."
 
 #. Message plugins
 #: split-email-providers.php
-msgid "Modal fermée"
+msgid "Register"
+msgstr "Enregistrer"
+
+#. Message plugins
+#: split-email-providers.php
+msgid "A provider with this email already exists."
+msgstr "Un fournisseur associé à cette adresse e-mail existe déjà."
+
+#. Message plugins
+#: split-email-providers.php
+msgid "Closed modal"
 msgstr "Modal fermée"
 
 #. Pagination plugins
 #: split-email-providers.php
-msgid "Précédent"
+msgid "Previous"
 msgstr "Précédent"
 
 #. Pagination plugins
 #: split-email-providers.php
-msgid "Suivant"
+msgid "Next"
 msgstr "Suivant"
 
 #. Pagination plugins
@@ -248,40 +305,70 @@ msgstr "Page"
 
 #. Pagination plugins
 #: split-email-providers.php
-msgid "sur"
+msgid "of"
 msgstr "sur"
 
-#. Importation plugins
+#. Pagination plugins
 #: split-email-providers.php
-msgid "Importation de Fournisseurs"
-msgstr "Importation de Fournisseurs"
+msgid "Shop details:"
+msgstr "Coordonnées de la boutique :"
 
-#. Importation plugins
+#. Pagination plugins
 #: split-email-providers.php
-msgid "Importation..."
-msgstr "Importation..."
+msgid "Ref:"
+msgstr "Ref :"
 
-#. Importation plugins
+#. Pagination plugins
 #: split-email-providers.php
-msgid "Veuillez sélectionner un fichier CSV."
-msgstr "Veuillez sélectionner un fichier CSV."
+msgid "Date:"
+msgstr "Date :"
 
-#. Exportation plugins
+#. Pagination plugins
 #: split-email-providers.php
-msgid "Aucun fournisseur à exporter."
-msgstr "Aucun fournisseur à exporter."
+msgid "Hello %s, you have a new order with the following products:"
+msgstr "Bonjour %s, vous avez une nouvelle commande avec les produits suivants :"
 
-#. Cle licence plugins
+#. Pagination plugins
 #: split-email-providers.php
-msgid "Saisie de la clé de licence"
-msgstr "Saisie de la clé de licence"
+msgid "Product name"
+msgstr "Nom du produit"
 
-#. Cle licence plugins
+#. Pagination plugins
 #: split-email-providers.php
-msgid "Clé de licence :"
-msgstr "Clé de licence "
+msgid "Quantity"
+msgstr "Quantité"
 
-#. Cle licence plugins
+#. Pagination plugins
 #: split-email-providers.php
-msgid "Enregistrer la clé"
-msgstr "Enregistrer la clé"
+msgid "GTIN/EAN code"
+msgstr "Code GTIN/EAN"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Price"
+msgstr "Prix"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "N/A"
+msgstr "N/A"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Delivery address:"
+msgstr "Adresse de livraison :"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "Thank you for processing this order quickly."
+msgstr "Merci de traiter cette commande rapidement."
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "New order for your products - %s"
+msgstr "Nouvelle commande pour vos produits - %s"
+
+#. Pagination plugins
+#: split-email-providers.php
+msgid "New order - %s → %s"
+msgstr "Nouvelle commande - %s → %s"

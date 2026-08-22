@@ -1,17 +1,11 @@
 === Split Email Providers ===
+Contributors: fandevelop
 Donate link: https://fan-develop.fr
 Tags: WooCommerce, supplier, email, supplier management
-<<<<<<< HEAD
-Requires at least: 5.0
-Tested up to: 6.8
-Requires PHP: 8.2
-Stable tag: 1.1.2
-=======
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
 Stable tag: 1.1.7
->>>>>>> 4d5846e (compatible WP 7.1)
 Requires Plugins: woocommerce
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -42,7 +36,7 @@ Main features:
 
 Automatic email sending to suppliers: With every order, emails are sent to the relevant suppliers with the details of their products.
 
-Seamless integration: Works directly with WooCommerce without complicated configuration.
+Seamless Integration: Works directly with WooCommerce without requiring complex configuration.
 
 Split orders by supplier based on the products in each order.
 
@@ -60,7 +54,14 @@ Redirect orders to your store (ideal for assembling or checking before customer 
 
 Low stock email alerts: Automatically send an email to a supplier when a product stock drops below a minimum threshold.
 
-🔗 Access the premium version here: Split Email Providers
+🔗 Access the premium version here: [Split Email Providers](https://split-email-providers.com/)
+
+For multi-vendor marketplaces, discover **Split Market**:
+
+- Advanced supplier management for each WCFM seller
+- Automatic emails sent to suppliers per seller, with a copy to the seller
+
+🔗 Discover the premium version here: [Split Market] (https://split-email-providers.com/)
 
 == Installation ==
 
@@ -82,6 +83,9 @@ Yes — Split Email Providers is designed specifically for WooCommerce stores.
 
 = Does the addon send emails automatically? =
 Yes — as soon as an order is placed and validated, the addon detects the supplier’s products and sends the emails automatically.
+
+= Is the seller notified when their suppliers receive an email? =
+Yes, the seller is systematically copied on emails sent to their suppliers.
 
 = Can the content of the supplier emails be customized? =
 No — advanced email customization is coming very soon in the Pro version.
@@ -108,6 +112,21 @@ Supplier email – 📨 Example of an automatic email sent to a supplier with th
 
 == Changelog ==
 
+= 1.1.7 =
+* Compatible with WordPress 7.1
+
+= 1.1.6 =
+* Minor bug fixes
+
+= 1.1.5 =
+* Compatible with WordPress 7.0
+
+= 1.1.4 =
+* Compatible with WordPress 6.9
+
+= 1.1.3 =
+* Added split email provider market compatibility for WCFM
+
 <<<<<<< HEAD
 =======
 = 1.1.7 =
@@ -127,70 +146,53 @@ Supplier email – 📨 Example of an automatic email sent to a supplier with th
 
 >>>>>>> 4d5846e (compatible WP 7.1)
 = 1.1.2 =
-Requires Plugins: woocommerce
+* Requires Plugins: woocommerce
 
 = 1.1.1 =
-
-Readme update
+* Readme update
 
 = 1.1.0 =
-
-Added low stock supplier email (Pro version)
+* Added low stock supplier email (Pro version)
 
 = 1.0.9 =
-
-Added images
+* Added images
 
 = 1.0.8 =
-
-Compatible with WordPress 6.8
+* Compatible with WordPress 6.8
 
 = 1.0.7 =
-
-Minor display bug fixes
+* Minor display bug fixes
 
 = 1.0.6 =
-
-Minor display bug fixes
+* Minor display bug fixes
 
 = 1.0.5 =
-
-Minor bug fixes
+* Minor bug fixes
 
 = 1.0.4 =
-
-Added translation strings (FR => US)
-
-Converted Pro version to addon for the free version
+* Added translation strings (FR => US)
+* Converted Pro version to addon for the free version
 
 = 1.0.3 =
-
-Added translation strings (FR => US)
-
-Added plugin activation check for Pro or Free version
+* Added translation strings (FR => US)
+* Added plugin activation check for Pro or Free version
 
 = 1.0.2 =
-
-Added translation strings (FR => US)
-
-Removed version management
+* Added translation strings (FR => US)
+* Removed version management
 
 = 1.0.1 =
-
-Translation FR => US
-
-Minor bug fixes
+* Translation FR => US
+* Minor bug fixes
 
 = 1.0.0 =
-
-🚀 Initial release of the addon
-
-📩 Automated email sending to suppliers
+* Initial release of the addon
+* Automated email sending to suppliers
 
 == Upgrade Notice ==
 
 = 1.0.0 =
-First version of Split Email Providers – automatically send emails to your suppliers without intermediaries.
+* First version of Split Email Providers – automatically send emails to your suppliers without intermediaries.
 
 == Additional Notes ==
 

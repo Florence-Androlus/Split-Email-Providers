@@ -1,17 +1,11 @@
 === Split Email Providers ===
+Contributors: fandevelop
 Donate link: https://fan-develop.fr  
 Tags: WooCommerce, fournisseur, email, gestion fournisseurs  
-<<<<<<< HEAD
-Requires at least: 5.0  
-Tested up to: 6.8  
-Requires PHP: 8.2  
-Stable tag: 1.1.2 
-=======
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.2
 Stable tag: 1.1.7 
->>>>>>> 4d5846e (compatible WP 7.1)
 Requires Plugins: woocommerce
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
@@ -37,7 +31,7 @@ Avec **Split Email Providers**, chaque commande est automatiquement triée par f
 **Plus de 3 à 5 heures de travail manuel économisées par semaine sur votre boutique WooCommerce.**
 
 Fonctionnalités principales :
-- **Envoi d’emails automatiques aux fournisseurs** : À chaque commande, les emails sont envoyés aux fournisseurs concernés avec les détails de leurs produits.
+- **Envoi d’emails automatiques aux fournisseurs** : À chaque commande, les emails sont envoyés aux fournisseurs concernés avec les détails de leurs produits avec copie à l'administrateur de la boutique.
 - **Intégration fluide** : Fonctionne directement avec WooCommerce sans nécessiter de configuration complexe.
 - Découpe des commandes par fournisseur selon les produits
 
@@ -47,12 +41,20 @@ Faites passer votre expérience au niveau supérieur avec des modules complémen
 
 Passez à **Split Email Providers Pro** et accédez à des options avancées :
 
-Import / Export des fournisseurs et produits
-Ajout du prix dans les emails envoyés aux fournisseurs
-Redirection des commandes vers votre boutique (idéal pour assembler ou contrôler avant livraison client)  
-Envoi d’email de réapprovisionnement : Envoyez automatiquement un email à un fournisseur lorsqu’un produit passe sous un seuil de stock minimum.
+- Import / Export des fournisseurs et produits
+- Ajout du prix dans les emails envoyés aux fournisseurs
+- Redirection des commandes vers votre boutique (idéal pour assembler ou contrôler avant livraison client)  
+- Envoi d’email de réapprovisionnement : Envoyez automatiquement un email à un fournisseur lorsqu’un produit passe sous un seuil de stock minimum.
 
 🔗 Accédez à la version premium [Split Email Providers](https://split-email-providers.com/)
+
+Pour les marketplaces multi-vendeurs, découvrez **Split Market ** :  
+
+- Gestion avancée des fournisseurs pour chaque vendeur WCFM  
+- Envoi d’emails automatiques aux fournisseurs par vendeur avec copie au vendeur  
+
+
+🔗 Découvrez la version premium **Split Market Pro** [ici](https://split-email-providers.com/split-market)
 
 == Installation ==
  
@@ -72,6 +74,9 @@ Oui, Split Email Providers est conçu spécifiquement pour les boutiques WooComm
 = Est-ce que l'addon envoie les emails automatiquement ? =  
 Oui, dès qu'une commande est passée et validée, l'addon détecte les produits de chaque fournisseur et envoie l'email automatiquement.
 
+= Le vendeur est-il notifié quand ses fournisseurs reçoivent un email ? =  
+Oui, le vendeur est systématiquement en copie des emails envoyés à ses fournisseurs.  
+
 = Peut-on personnaliser le contenu des emails envoyés aux fournisseurs ? =  
 Non, La personnalisation avancée arrive très bientôt dans la version Pro.  
 
@@ -89,8 +94,6 @@ Non, La personnalisation avancée arrive très bientôt dans la version Pro.
 
 == Changelog ==
 
-<<<<<<< HEAD
-=======
 = 1.1.7 =
 * Compatible avec WordPress 7.1
 
@@ -106,9 +109,8 @@ Non, La personnalisation avancée arrive très bientôt dans la version Pro.
 = 1.1.3 =
 * Ajout compatibilité split email provider market pour wcfm
 
->>>>>>> 4d5846e (compatible WP 7.1)
 = 1.1.2 =
-Requires Plugins: woocommerce
+* Requires Plugins: woocommerce
 
 = 1.1.1 =
 * Modification du readme

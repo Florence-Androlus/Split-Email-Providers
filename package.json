@@ -1,0 +1,32 @@
+{
+  "dependencies": {
+    "@popperjs/core": "2.11",
+    "bootstrap": "^5.3.3",
+    "bootstrap-vue-3": "^0.3.12",
+    "buffer": "^6.0.3",
+    "datatables.net-dt": "^2.1.8",
+    "fontawesome-free": "^1.0.4",
+    "gettext-parser": "^8.0.0",
+    "install": "^0.13.0",
+    "util": "^0.12.5",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@wordpress/scripts": "^30.9.0",
+    "babel-loader": "^9.2.1",
+    "compression-webpack-plugin": "^11.1.0",
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0",
+    "vue-loader": "^17.3.1",
+    "vue-template-compiler": "^0.1.0",
+    "webpack": "^5.97.1",
+    "webpack-bundle-analyzer": "^4.10.2",
+    "webpack-cli": "^6.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production"
+  }
+}

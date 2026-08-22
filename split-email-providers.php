@@ -1,15 +1,9 @@
 <?php
 /* Plugin Name:        Split Email Providers
-<<<<<<< HEAD
-* Description:         Gestion des envois d'emails aux fournisseurs
-* Version:             1.1.2
-* Requires at least:   6.8
-=======
 * Description:         Managing email communications to Providers 
 * Version:             1.1.7
 * Requires at least:   6.8
 * Tested up to:        7.1  
->>>>>>> 4d5846e (compatible WP 7.1)
 * Requires PHP:        8.2
 * Requires Plugins:    woocommerce
 * Author:              Fan-Develop
@@ -38,9 +32,6 @@ function fand_check_woocommerce() {
 }
 add_action('admin_init', __NAMESPACE__ . '\\fand_check_woocommerce');
 
-// Chargement des traductions
-load_plugin_textdomain('split-email-providers', false, dirname(plugin_basename(__FILE__)) . '/languages');
-
 // Chargement de l'autoloader Composer si disponible
 // Vérifie si l'autoload de la version Free est déjà chargé
 if (!class_exists('fand\\Classes\\Apifournisseur')) { 
@@ -49,32 +40,24 @@ if (!class_exists('fand\\Classes\\Apifournisseur')) {
 }
 
 // Définition des constantes
-<<<<<<< HEAD
-define('FAND_VERSION', '1.1.2');
-=======
 define('FAND_VERSION', '1.1.7');
->>>>>>> 4d5846e (compatible WP 7.1)
 define('FAND_MAIN_FILE', __FILE__);
 define('FAND_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FAND_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('FAND_PRO_PLUGIN', 'split-email-providers-pro/split-email-providers-pro.php');
 
-// Vérification si la version Pro est active
-if (is_plugin_active(FAND_PRO_PLUGIN)) {
-
-    define('FAND_PRO_ACTIVE', true);
-} else {
-    define('FAND_PRO_ACTIVE', false);
+// Vérification si la version MARKET est active
+if (!defined('FAND_MARKET_ACTIVE')) {
+    define('FAND_MARKET_ACTIVE', false);
 }
 
 // Défini la table des fournisseurs
 global $wpdb;
 define('FAND_FOURNISSEURS_TABLE', $wpdb->prefix . 'fand_fournisseurs');
+// Table des adresses/relations (Celle où tu as tes données !)
+define('FAND_COMMERCANTS_FOURNISSEURS_TABLE', $wpdb->prefix . 'fand_commercants_fournisseurs');
+// Table des relations termes
+define('FAND_COMMERCANTS_TERMS', $wpdb->prefix . 'fand_commercants_terms');
 define('FAND_FOURNISSEURS_ATTRIBUT', 'pa_fournisseur');
-// Vérification si l'addon est activé
-if (!FAND_PRO_ACTIVE) {
-    define('FAND_PRO_IMPORT_EXPORT_ENABLED', false);
-}
 
 // Sécurité : éviter l'accès direct
 if (!defined('WPINC')) {

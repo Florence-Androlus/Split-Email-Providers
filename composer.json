@@ -1,0 +1,17 @@
+{
+    "name": "androlus/split-email-fournisseurs",
+    "authors": [
+        {
+            "name": "androlus",
+            "email": "contact@fan-develop.fr"
+        }
+    ],
+
+    "autoload": {
+        "psr-4": {
+            "fand\\": ".",
+            "fand\\Classes\\": "src/Classes/"
+        }
+    }
+
+}

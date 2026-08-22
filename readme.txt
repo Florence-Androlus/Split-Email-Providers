@@ -1,10 +1,17 @@
 === Split Email Providers ===
 Donate link: https://fan-develop.fr
 Tags: WooCommerce, supplier, email, supplier management
+<<<<<<< HEAD
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.2
 Stable tag: 1.1.2
+=======
+Requires at least: 6.8
+Tested up to: 7.1
+Requires PHP: 8.2
+Stable tag: 1.1.7
+>>>>>>> 4d5846e (compatible WP 7.1)
 Requires Plugins: woocommerce
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -101,6 +108,24 @@ Supplier email – 📨 Example of an automatic email sent to a supplier with th
 
 == Changelog ==
 
+<<<<<<< HEAD
+=======
+= 1.1.7 =
+* Compatible with WordPress 7.1
+
+= 1.1.6 =
+* Minor bug fixes
+
+= 1.1.5 =
+* Compatible with WordPress 7.0
+
+= 1.1.4 =
+* Compatible with WordPress 6.9
+
+= 1.1.3 =
+* Added split email provider market compatibility for WCFM
+
+>>>>>>> 4d5846e (compatible WP 7.1)
 = 1.1.2 =
 Requires Plugins: woocommerce
 

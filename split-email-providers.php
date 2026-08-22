@@ -1,8 +1,15 @@
 <?php
 /* Plugin Name:        Split Email Providers
+<<<<<<< HEAD
 * Description:         Gestion des envois d'emails aux fournisseurs
 * Version:             1.1.2
 * Requires at least:   6.8
+=======
+* Description:         Managing email communications to Providers 
+* Version:             1.1.7
+* Requires at least:   6.8
+* Tested up to:        7.1  
+>>>>>>> 4d5846e (compatible WP 7.1)
 * Requires PHP:        8.2
 * Requires Plugins:    woocommerce
 * Author:              Fan-Develop
@@ -42,7 +49,11 @@ if (!class_exists('fand\\Classes\\Apifournisseur')) {
 }
 
 // Définition des constantes
+<<<<<<< HEAD
 define('FAND_VERSION', '1.1.2');
+=======
+define('FAND_VERSION', '1.1.7');
+>>>>>>> 4d5846e (compatible WP 7.1)
 define('FAND_MAIN_FILE', __FILE__);
 define('FAND_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FAND_PLUGIN_DIR', plugin_dir_path(__FILE__));

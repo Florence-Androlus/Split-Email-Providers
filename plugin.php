@@ -54,10 +54,27 @@ class FANDSettingsPage {
     }
 
 	static function delete_fournisseur_callback() {
+<<<<<<< HEAD
         // Récupérer les données envoyées via POST
         $data = json_decode(file_get_contents('php://input'), true);
 		//error_log('Requête delete_fournisseur reçue.');
 		//error_log(print_r($_POST, true));
+=======
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error(['message' => __('Unauthorized.', 'split-email-providers')]);
+			wp_die();
+		}
+
+		// Vérification nonce via GET
+		if (!isset($_GET['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'fandsep_nonce')) {
+			wp_send_json_error(['message' => __('Security check failed.', 'split-email-providers')]);
+			wp_die();
+		}
+
+		$raw = file_get_contents('php://input');
+		$data = json_decode($raw, true);
+		
+>>>>>>> 4d5846e (compatible WP 7.1)
         if (isset($data['fournisseur_id'])) {
             // Effectuez la suppression du fournisseur en fonction de la clé
             $alert=Database::delete_fournisseur($data); // Fonction à définir selon votre base de données
@@ -84,7 +101,25 @@ class FANDSettingsPage {
 
 	// Fonction AJAX pour sauvegarder un fournisseur
 	static function save_fournisseur_ajax() {
+<<<<<<< HEAD
         $data = json_decode(file_get_contents('php://input'), true);
+=======
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error(['message' => __('Unauthorized.', 'split-email-providers')]);
+			wp_die();
+		}
+
+		// Vérification nonce via GET
+		if (!isset($_GET['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'fandsep_nonce')) {
+			wp_send_json_error(['message' => __('Security check failed.', 'split-email-providers')]);
+			wp_die();
+		}
+
+		$raw = file_get_contents('php://input');
+		$data = json_decode($raw, true);
+		// error_log("Données reçues pour save_fournisseur_ajax : " . print_r($data, true));
+        
+>>>>>>> 4d5846e (compatible WP 7.1)
 		//error_log(print_r($data['fournisseur'], true));
 		if (isset($data['fournisseur'])) {
 			if ($data['mode']==='add'){
@@ -156,12 +191,29 @@ class FANDSettingsPage {
 			$translations_file = plugin_dir_path(__FILE__) . 'languages/split-email-providers-en_US.json';
 			$translations = json_decode(file_get_contents($translations_file), true);
 		}
+<<<<<<< HEAD
 			
 		// Création du tableau de données
+=======
+
+		/*$data_to_pass = [
+			'ajax_url'      => admin_url('admin-ajax.php'),
+			'locale'        => $current_locale,
+			'translations'  => $translations, 
+			'licenceStatus' => defined('FAND_PRO_IMPORT_EXPORT_ENABLED') && FAND_PRO_IMPORT_EXPORT_ENABLED,
+			'import_nonce'  => wp_create_nonce('import_fournisseurs_action'),
+			'nonce'        => wp_create_nonce('fandsep_nonce'),
+		];*/
+
+>>>>>>> 4d5846e (compatible WP 7.1)
 		$data_to_pass = [
 			'locale' => $current_locale,
 			'translations' => $translations,
+<<<<<<< HEAD
 			'licenceStatus' => FAND_PRO_IMPORT_EXPORT_ENABLED,
+=======
+			'nonce'        => wp_create_nonce('fandsep_nonce'),
+>>>>>>> 4d5846e (compatible WP 7.1)
 		];
 	
 		// Passer les données à Vue.js

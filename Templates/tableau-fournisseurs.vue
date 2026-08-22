@@ -232,7 +232,7 @@ export default {
         });
 
         // Écouter l'événement de refresh du plugin PRO
-        document.addEventListener('fandsep_refresh_fournisseurs', () => {
+        document.addEventListener('refresh_fournisseurs', () => {
             this.fetchFournisseurs();
         });
     },
@@ -362,7 +362,7 @@ export default {
 
             // Pour un export, on peut simplement ouvrir l'URL AJAX dans un nouvel onglet
             // car l'action AJAX va forcer le téléchargement du fichier CSV
-            const exportUrl = ajax_url + '?action=sep_export_fournisseurs';
+            const exportUrl = ajax_url + '?action=fandsep_export_fournisseurs';
             window.location.href = exportUrl;
         },
 

@@ -98,7 +98,7 @@ export default {
     },
 
     fetchCountries() {
-      fetch(ajax_url + '?action=get_countries')
+      fetch(ajax_url + '?action=fandsep_get_countries')
         .then((response) => response.json())
         .then((data) => {
           if (data.success && data.data) {

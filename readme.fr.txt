@@ -3,9 +3,9 @@ Contributors: fandevelop
 Donate link: https://fan-develop.fr  
 Tags: WooCommerce, fournisseur, email, gestion fournisseurs  
 Requires at least: 6.8
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.1.6 
+Stable tag: 1.1.7 
 Requires Plugins: woocommerce
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
@@ -93,6 +93,9 @@ Non, La personnalisation avancée arrive très bientôt dans la version Pro.
 9. **Email au fournisseur** – 📨 Exemple d’email automatique envoyé à un fournisseur avec les produits concernés par une commande.
 
 == Changelog ==
+
+= 1.1.7 =
+* Compatible avec WordPress 7.1
 
 = 1.1.6 =
 * Correction de bugs mineurs

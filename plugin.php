@@ -77,7 +77,7 @@ class FANDSettingsPage {
 		}
 
 		// Vérification nonce via GET
-		if (!isset($_GET['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'sep_nonce')) {
+		if (!isset($_GET['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'fandsep_nonce')) {
 			wp_send_json_error(['message' => __('Security check failed.', 'split-email-providers')]);
 			wp_die();
 		}
@@ -117,7 +117,7 @@ class FANDSettingsPage {
 		}
 
 		// Vérification nonce via GET
-		if (!isset($_GET['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'sep_nonce')) {
+		if (!isset($_GET['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'fandsep_nonce')) {
 			wp_send_json_error(['message' => __('Security check failed.', 'split-email-providers')]);
 			wp_die();
 		}
@@ -217,14 +217,14 @@ class FANDSettingsPage {
 			'translations'  => $translations, 
 			'licenceStatus' => defined('FAND_PRO_IMPORT_EXPORT_ENABLED') && FAND_PRO_IMPORT_EXPORT_ENABLED,
 			'import_nonce'  => wp_create_nonce('import_fournisseurs_action'),
-			'nonce'        => wp_create_nonce('sep_nonce'),
+			'nonce'        => wp_create_nonce('fandsep_nonce'),
 		];*/
 
 		$data_to_pass = [
 			'ajax_url'     => admin_url('admin-ajax.php'),
 			'locale'       => $current_locale,
 			'translations' => $translations,
-			'nonce'        => wp_create_nonce('sep_nonce'),
+			'nonce'        => wp_create_nonce('fandsep_nonce'),
 		];
 	
 		// Passer les données à Vue.js

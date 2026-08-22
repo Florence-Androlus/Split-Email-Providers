@@ -1,9 +1,9 @@
 <?php
 /* Plugin Name:        Split Email Providers
 * Description:         Managing email communications to Providers 
-* Version:             1.1.6
+* Version:             1.1.7
 * Requires at least:   6.8
-* Tested up to:        7.0  
+* Tested up to:        7.1  
 * Requires PHP:        8.2
 * Requires Plugins:    woocommerce
 * Author:              Fan-Develop
@@ -40,7 +40,7 @@ if (!class_exists('fand\\Classes\\Apifournisseur')) {
 }
 
 // Définition des constantes
-define('FAND_VERSION', '1.1.6');
+define('FAND_VERSION', '1.1.7');
 define('FAND_MAIN_FILE', __FILE__);
 define('FAND_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FAND_PLUGIN_DIR', plugin_dir_path(__FILE__));
